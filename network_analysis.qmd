@@ -1,0 +1,120 @@
+---
+title: "analysis"
+format: html
+editor: visual
+---
+
+## SDS 338 Final Project
+
+```{r}
+library(incidentally)
+library(tidyverse)
+library(tibble)
+library(janitor)
+
+library(rio)
+library(statnet)
+
+tweets <- read_csv("senator_twitter_May-Oct.csv")
+sen <- incidence.from.congress(session = 117, types = c("s"), areas = c("All"), format = "data", narrative = TRUE)
+```
+
+```{r}
+mat <- as.data.frame(sen$matrix[1:101, 1:5357])
+
+s597_df <- mat %>% 
+  select(S597) %>% 
+  clean_names()
+
+s597_df <- s597_df %>% 
+  rownames_to_column("senator") 
+
+s597_df <- s597_df %>% 
+  mutate(senator_j = senator) %>% 
+  mutate(s597_j = s597) 
+
+#create all combinations of senators
+s597_combos <- s597_df %>% 
+  expand(senator, senator_j) %>% 
+  filter(senator != senator_j)
+
+
+
+```
+
+
+
+## We now have an empty edgelist- bring in other data
+
+So far, we have just created an edgelist, but this includes all potential combinations (this is a dyadic dataset with an i node and a j node). We know that senators voted differently, so we need to merge in the vote data (or whatever data you are using) in order to drop potential ties that do not exist. So, we create two dataframes, one for the sender (i) and one for the receiver (j).
+
+```{r}
+ DF1 <- df |>
+   select(senator, blinken, yellen, buttigieg, party)
+
+ DF2 <- df |>
+   select(senator_j, blinken_j, yellen_j, buttigieg_j, party_j)
+
+ ### Merge data
+ joined_data <- left_join(combos, DF1, by = "senator")
+  joined_data <- left_join(joined_data, DF2, by = "senator_j")
+```
+
+## 5. Filter to only include edges you want
+
+We now have a full dyadic dataset with the characteristics merged in, but we still need to filter out cases where senators vote differently. The code below only keeps cases where the two senators vote the same on all three nominees.
+
+```{r}
+edge_list <- joined_data |>
+  filter(blinken_j==blinken & yellen_j==yellen & buttigieg_j==buttigieg) 
+```
+
+We have an edgelist, but the problem is that it doesn't include isolates. So, we first need to create an empty dataset of all 100 senators, then we can bring in our ties data.
+
+```{r, message=F, warning=F}
+library(network)
+```
+
+We need to tell R how many nodes to include
+
+```{r}
+## While we "think" we know there are 100 senators, it's pretty common to have 102-105 senators in a term due to resignations, etc. We can automate the size of the network by using the nrow command. 
+# We now have an empty network
+nv <- nrow(df)
+net_senate <-network.initialize(nv)
+
+plot(net_senate)
+```
+
+## Name vertices
+
+```{r}
+network.vertex.names(x=net_senate) <- df$senator
+```
+
+```{r}
+senate_el <- edge_list |>
+  select(senator, senator_j)
+net_senate[as.matrix(senate_el)] <- 1
+```
+
+```{r}
+plot(net_senate)
+
+```
+
+```{r}
+  set.vertex.attribute(x=net_senate,attrname="Population",val=df$party) 
+
+
+```
+
+```{r}
+plot(net_senate, label=network.vertex.names(net_senate))
+
+set.vertex.attribute(x = net_senate, attrname = "party_id", val = df$party)
+
+plot(net_senate, label=network.vertex.names(net_senate), color = )
+```
+
+
