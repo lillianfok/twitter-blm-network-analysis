@@ -38,36 +38,23 @@ s597_combos <- s597_df %>%
   expand(senator, senator_j) %>% 
   filter(senator != senator_j)
 
+#first set of senators
+ df1 <- s597_df |>
+   select(senator, s597)
 
-
-```
-
-
-
-## We now have an empty edgelist- bring in other data
-
-So far, we have just created an edgelist, but this includes all potential combinations (this is a dyadic dataset with an i node and a j node). We know that senators voted differently, so we need to merge in the vote data (or whatever data you are using) in order to drop potential ties that do not exist. So, we create two dataframes, one for the sender (i) and one for the receiver (j).
-
-```{r}
- DF1 <- df |>
-   select(senator, blinken, yellen, buttigieg, party)
-
- DF2 <- df |>
-   select(senator_j, blinken_j, yellen_j, buttigieg_j, party_j)
+#second set of senators
+ df2 <- s597_df |>
+   select(senator_j, s597_j)
 
  ### Merge data
- joined_data <- left_join(combos, DF1, by = "senator")
-  joined_data <- left_join(joined_data, DF2, by = "senator_j")
+ joined_data <- left_join(s597_combos, df1, by = "senator")
+  joined_data <- left_join(joined_data, df2, by = "senator_j")
+
+s597_edge_list <- joined_data |>
+  filter(s597_j==s597)
+
 ```
 
-## 5. Filter to only include edges you want
-
-We now have a full dyadic dataset with the characteristics merged in, but we still need to filter out cases where senators vote differently. The code below only keeps cases where the two senators vote the same on all three nominees.
-
-```{r}
-edge_list <- joined_data |>
-  filter(blinken_j==blinken & yellen_j==yellen & buttigieg_j==buttigieg) 
-```
 
 We have an edgelist, but the problem is that it doesn't include isolates. So, we first need to create an empty dataset of all 100 senators, then we can bring in our ties data.
 
