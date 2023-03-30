@@ -1,0 +1,44 @@
+---
+title: "twitter network analysis"
+format: html
+editor: visual
+---
+
+# Twitter Network
+
+```{r}
+library(tidyverse)
+
+tweets <- read_csv("senator_twitter_May-Oct.csv")
+```
+
+#Create sample
+```{r}
+set.seed(2023)
+sample_tweets <- sample_n(tweets, 1500)
+#write.csv(sample_tweets, "sample-twitter.csv")
+```
+
+
+## Dictionary Search
+```{r}
+conserv_terms <- c('terrorist', 'anarchy', 'riot', 'loot', 'antifa', 'law', 'order', 'security', 'rule', 'riot', 'ban')
+
+lib_terms <- c('allies', 'action','fight','outrage', 'oppression','anger','racism', 'race','injustice', 'justice', 'equality', 'inequality', 'blm', 'black lives matter')
+
+covid <- c('COVID', 'virus')
+
+#'additional terms:'law enforcement', 'George Floyd', 
+
+terms <- c(conserv_terms, lib_terms)
+
+#are these the right terms to use?
+#should we filter out covid-19 tweets
+```
+
+```{r}
+filtered_tweets <- tweets %>% 
+  filter(!grepl(paste(covid, collapse = "|"), text)) %>% 
+  mutate(blm = grepl(paste(terms, collapse = "|"), text))
+```
+

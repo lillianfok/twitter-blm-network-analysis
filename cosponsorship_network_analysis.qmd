@@ -1,5 +1,5 @@
 ---
-title: "analysis"
+title: "cosponsorship network"
 format: html
 editor: visual
 ---
@@ -50,9 +50,9 @@ s597_combos <- s597_df %>%
  joined_data <- left_join(s597_combos, df1, by = "senator")
   joined_data <- left_join(joined_data, df2, by = "senator_j")
 
+  #only keep same votes
 s597_edge_list <- joined_data |>
   filter(s597_j==s597)
-
 ```
 
 
@@ -67,7 +67,7 @@ We need to tell R how many nodes to include
 ```{r}
 ## While we "think" we know there are 100 senators, it's pretty common to have 102-105 senators in a term due to resignations, etc. We can automate the size of the network by using the nrow command. 
 # We now have an empty network
-nv <- nrow(df)
+nv <- nrow(s597_df)
 net_senate <-network.initialize(nv)
 
 plot(net_senate)
@@ -76,32 +76,51 @@ plot(net_senate)
 ## Name vertices
 
 ```{r}
-network.vertex.names(x=net_senate) <- df$senator
+network.vertex.names(x=net_senate) <- s597_df$senator
 ```
 
 ```{r}
-senate_el <- edge_list |>
+senate_el <- s597_edge_list |>
   select(senator, senator_j)
 net_senate[as.matrix(senate_el)] <- 1
+
+#are there isolates here?
 ```
 
 ```{r}
 plot(net_senate)
 
+#should non cosponsors be isolates?
+
+#cosponsorship network with weighted ties 
+
+#edge covariate percentage difference, testing homophily
+#node: percent, likelihood of cosponsorship 
 ```
 
+
+Independent Variables
 ```{r}
-  set.vertex.attribute(x=net_senate,attrname="Population",val=df$party) 
+#numerical ideology score
+
+#ratio/frequency of tweets
+
+#senator demographics 
+
+  set.vertex.attribute(x=net_senate,attrname="party_id",val=df$party) 
 
 
 ```
 
+#Filter for only senators
 ```{r}
-plot(net_senate, label=network.vertex.names(net_senate))
+#senator list
+names<- df1 %>% 
+  separate(senator, c('title', 'last name', 'first name')) %>% 
+  unite(name, c('first name', 'last name'), sep = " ")
 
-set.vertex.attribute(x = net_senate, attrname = "party_id", val = df$party)
-
-plot(net_senate, label=network.vertex.names(net_senate), color = )
+senator_tweets <- tweets %>% 
+  filter(name == "Elizabeth Warren")
 ```
 
 
