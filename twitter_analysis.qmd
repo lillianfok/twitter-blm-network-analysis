@@ -12,21 +12,46 @@ library(stopwords)
 library(purrr)
 library(corpus)
 library(janitor)
+library(caret)
 
-tweets <- read_csv("senator_twitter_May-Oct.csv")
+tweets <- read_csv("data/senator_twitter_May-Oct.csv")
 ```
 
-# Create sample
+# Create labeled sample
 ```{r}
 set.seed(2023)
-sample_tweets <- tweets %>% 
+tweets <- tweets %>% 
   sample_n(1500) %>% 
   clean_names() %>% 
-  select(x1, text) %>% 
+  select(x1, text, time, name, party) %>% 
   add_column(for_blm = NA) %>% 
-  add_column(against_blm = NA)
+  add_column(against_blm = NA) %>% 
 
-#write.csv(sample_tweets, "sample-twitter.csv")
+#filters <- c('COVID', 'virus', 'social distanc', 'nurse', 'healthcare', 'hospital', 'health', 'mask', 'testing', 'unemployment', 'schools', 'PPE', 'ballot', 'vote', 'census', 'symptom')
+
+#filtered_sample_tweets <- tweets %>% 
+#  filter(!grepl(paste(covid, collapse = "|"), text))
+
+#write.csv(full_sample, "data/sample-labelled.csv")
+
+
+full_sample <- read_csv("data/sample-labelled.csv")
+
+#create binary topic indicator
+sample_tweets$topic_blm <- ifelse(sample_tweets$for_blm, 1,
+               ifelse(sample_tweets$against_blm, 1, 0))
+
+#START HERE: join onto rest of tweets
+full_sample <- tweets %>% 
+  left_join(sample_tweets, by = "x1") %>%  #get from google sheets
+  select(x1, text.x, time.x, name.x, party.x, topic_blm, for_blm.y, against_blm.y) %>% 
+  rename(text = text.x, time = time.x, name = name.x, party = party.x, for_blm = for_blm.y, against_blm = against_blm.y)
+
+#divide into training and test sets
+train <- sample(1:nrow(full_sample), round(0.7*nrow(full_sample),0), F)
+
+d_train <- sample[train,]
+d_test <- sample[-train,]
 ```
 
 # Define dictionary function
@@ -58,29 +83,71 @@ create_dictionary <- function(data){
 # Create dictionary
 ```{r}
 dict_train <- create_dictionary(sample_tweets)
-dict_train[1:10]
 ```
 
-
-## Dictionary Search
+# Define document-term-matrix function
 ```{r}
-conserv_terms <- c('terrorist', 'anarchy', 'riot', 'loot', 'antifa', 'law', 'order', 'security', 'rule', 'riot', 'ban')
-
-lib_terms <- c('allies', 'action','fight','outrage', 'oppression','anger','racism', 'race','injustice', 'justice', 'equality', 'inequality', 'blm', 'black lives matter')
-
-covid <- c('COVID', 'virus')
-
-#'additional terms:'law enforcement', 'George Floyd', 
-
-terms <- c(conserv_terms, lib_terms)
-
-#are these the right terms to use?
-#should we filter out covid-19 tweets
+create_dtm <- function(data, dict){
+  corpus <- data$text
+  
+  #Repeat pre-processing from above
+  corpus <- purrr::map(corpus, function(x) str_split(tolower(x),"\\s+") %>% unlist) 
+  corpus <- purrr::map(corpus, function(x) gsub("[^a-z]","",x))
+  corpus <- purrr::map(corpus, function(x) x[!(x %in% stopwords::stopwords("en"))])
+  corpus <- purrr::map(corpus, function(x) text_tokens(x, stemmer="en") %>% unlist)
+  
+  #Keep only words from the dictionary
+  corpus <- purrr::map(corpus, function(x) x[x %in% dict])
+  
+  #Make dtm
+  dtm <- as.data.frame(matrix(0L, nrow=nrow(data), ncol=length(dict)))
+  names(dtm) <- dict
+  
+  freq <- purrr::map(corpus, table)
+  for (i in 1:nrow(dtm)){
+    dtm[i, names(freq[[i]])] <- unname(freq[[i]])
+  }
+  
+  return(dtm)
+}
 ```
 
+# Create DTM
 ```{r}
-filtered_tweets <- tweets %>% 
-  filter(!grepl(paste(covid, collapse = "|"), text)) %>% 
-  mutate(blm = grepl(paste(terms, collapse = "|"), text))
+dtm_train <- create_dtm(d_train, dict_train)
 ```
+
+# Define binary classification algorithm
+```{r}
+train_model <- function(data, dtm, target_topic){
+ t <- factor(unlist(data[,target_topic]), levels=c(1,0))
+ 
+ caret::train(dtm, t, method="xgbTree",
+                     trControl = trainControl(method="cv", number=5, 
+                                              search = "random", 
+                                              verboseIter=T))
+}
+```
+
+# Run classification
+```{r}
+set.seed(2023)
+mod <- train_model(d_train, dtm_train, "topic_blm")
+mod
+```
+
+# Define evaluation function
+```{r}
+evaluate_model <- function(model, data_test, dict, target_topic){
+  t <- factor(unlist(data_test[,target_topic]), levels=c(1,0))
+  dtm_test <- create_dtm(data_test, dict)
+  
+  predictions <- predict(mod, newdata = dtm_test)
+  confusionMatrix(predictions, t)
+  
+}
+
+evaluate_model(mod, d_test, dict_train, "topic_blm")
+```
+
 
