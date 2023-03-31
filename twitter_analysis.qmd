@@ -8,15 +8,57 @@ editor: visual
 
 ```{r}
 library(tidyverse)
+library(stopwords)
+library(purrr)
+library(corpus)
+library(janitor)
 
 tweets <- read_csv("senator_twitter_May-Oct.csv")
 ```
 
-#Create sample
+# Create sample
 ```{r}
 set.seed(2023)
-sample_tweets <- sample_n(tweets, 1500)
+sample_tweets <- tweets %>% 
+  sample_n(1500) %>% 
+  clean_names() %>% 
+  select(x1, text) %>% 
+  add_column(for_blm = NA) %>% 
+  add_column(against_blm = NA)
+
 #write.csv(sample_tweets, "sample-twitter.csv")
+```
+
+# Define dictionary function
+credit https://www.r-bloggers.com/2021/11/detecting-topics-in-mails-tweets-etc-how-to-create-a-text-classification-algorithm-in-r/ 
+```{r}
+create_dictionary <- function(data){
+  corpus <- data$text
+  
+  #split up words and convert to lowercase
+  corpus <- purrr::map(corpus, function(x) str_split(tolower(x),"\\s+") %>% unlist) 
+  
+  #remove non-letters
+  corpus <- purrr::map(corpus, function(x) gsub("[^a-z]","",x))
+  
+  #remove stop-words ("the", "in", etc.)
+  corpus <- purrr::map(corpus, function(x) x[!(x %in% stopwords::stopwords("en"))])
+  
+  #stem all words (eg sentences -> sentenc)
+  corpus <- purrr::map(corpus, function(x) text_tokens(x, stemmer="en") %>% unlist)
+  
+  #keep only words occurring 20+
+  words <- as.data.frame(sort(table(unlist(corpus)), decreasing=T), stringsAsFactors = F)
+  words <- words$Var1[which(words$Freq >=20)]
+  
+  return(words)  
+}
+```
+
+# Create dictionary
+```{r}
+dict_train <- create_dictionary(sample_tweets)
+dict_train[1:10]
 ```
 
 
