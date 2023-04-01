@@ -15,9 +15,11 @@ library(janitor)
 library(caret)
 
 tweets <- read_csv("data/senator_twitter_May-Oct.csv")
+
+full_sample <- read_csv("data/full-labelled-sample.csv")
 ```
 
-# Create labeled sample
+# Data wrangling (DON'T RUN)
 ```{r}
 set.seed(2023)
 tweets <- tweets %>% 
@@ -25,34 +27,42 @@ tweets <- tweets %>%
   clean_names() %>% 
   select(x1, text, time, name, party) %>% 
   add_column(for_blm = NA) %>% 
-  add_column(against_blm = NA) %>% 
+  add_column(against_blm = NA) 
 
 #filters <- c('COVID', 'virus', 'social distanc', 'nurse', 'healthcare', 'hospital', 'health', 'mask', 'testing', 'unemployment', 'schools', 'PPE', 'ballot', 'vote', 'census', 'symptom')
 
 #filtered_sample_tweets <- tweets %>% 
 #  filter(!grepl(paste(covid, collapse = "|"), text))
 
-#write.csv(full_sample, "data/sample-labelled.csv")
+
+labelled_extra_sample <- read_csv("data/labelled-extra-sample.csv")
+labelled_filtered_sample <- read_csv("data/labelled-filtered-sample.csv")
+
+full_sample <- labelled_filtered_sample %>% 
+  natural_join(labelled_extra_sample, by = "x1", jointype = "FULL") %>% 
+  select (-c(...1, ...2, ...7, party.y, text.y, time.y, name.y)) %>% 
+    mutate(name = case_when(!is.na(name) ~ name,
+                          is.na(name) ~ name.x)) %>% 
+  mutate(text = case_when(!is.na(text) ~ text,
+                          is.na(text) ~ text.x)) %>% 
+  mutate(party = case_when(!is.na(party) ~ party,
+                          is.na(party) ~ party.x)) %>% 
+  mutate(time = case_when(!is.na(time) ~ time,
+                          is.na(time) ~ time.x)) %>% 
+  select(x1, time, text, name, party, for_blm, against_blm, topic_blm)
+
+#write.csv(full_sample, 'data/full-labelled-sample.csv')
+```
 
 
-full_sample <- read_csv("data/sample-labelled.csv")
-
-#create binary topic indicator
-sample_tweets$topic_blm <- ifelse(sample_tweets$for_blm, 1,
-               ifelse(sample_tweets$against_blm, 1, 0))
-
-#START HERE: join sample tweets onto rest of tweets
-full_sample <- tweets %>% 
-  left_join(sample_tweets, by = "x1") %>%  #get from google sheets
-  select(x1, text.x, time.x, name.x, party.x, topic_blm, for_blm.y, against_blm.y) %>% 
-  rename(text = text.x, time = time.x, name = name.x, party = party.x, for_blm = for_blm.y, against_blm = against_blm.y)
-
-#divide into training and test sets
+#Divide into training and testing samples
+```{r}
 train <- sample(1:nrow(full_sample), round(0.7*nrow(full_sample),0), F)
 
-d_train <- sample[train,]
-d_test <- sample[-train,]
+d_train <- full_sample[train,]
+d_test <- full_sample[-train,]
 ```
+
 
 # Define dictionary function
 credit https://www.r-bloggers.com/2021/11/detecting-topics-in-mails-tweets-etc-how-to-create-a-text-classification-algorithm-in-r/ 
@@ -80,10 +90,12 @@ create_dictionary <- function(data){
 }
 ```
 
-# Create dictionary
+
+# Create dictionary on training data
 ```{r}
-dict_train <- create_dictionary(sample_tweets)
+dict_train <- create_dictionary(d_train)
 ```
+
 
 # Define document-term-matrix function
 ```{r}
@@ -112,10 +124,12 @@ create_dtm <- function(data, dict){
 }
 ```
 
+
 # Create DTM
 ```{r}
 dtm_train <- create_dtm(d_train, dict_train)
 ```
+
 
 # Define binary classification algorithm
 ```{r}
@@ -129,12 +143,14 @@ train_model <- function(data, dtm, target_topic){
 }
 ```
 
+
 # Run classification
 ```{r}
 set.seed(2023)
 mod <- train_model(d_train, dtm_train, "topic_blm")
 mod
 ```
+
 
 # Define evaluation function
 ```{r}
@@ -146,8 +162,26 @@ evaluate_model <- function(model, data_test, dict, target_topic){
   confusionMatrix(predictions, t)
   
 }
+```
 
+
+#Evaluate model accuracy
+```{r}
 evaluate_model(mod, d_test, dict_train, "topic_blm")
 ```
 
+
+# Check misclassifications
+```{r}
+dtm_test <- create_dtm(d_test, dict_train)
+predictions <- predict(mod, newdata = dtm_test)
+
+#false positives
+d_test[which(d_test$topic_blm == 0 & predictions == 1),][,] %>% View
+
+#false negatives
+d_test[which(d_test$topic_blm == 1 & predictions == 0),][,] %>% View
+```
+
+#Model for multiple topics
 
