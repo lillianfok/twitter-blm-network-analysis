@@ -41,7 +41,7 @@ full_sample <- read_csv("data/sample-labelled.csv")
 sample_tweets$topic_blm <- ifelse(sample_tweets$for_blm, 1,
                ifelse(sample_tweets$against_blm, 1, 0))
 
-#START HERE: join onto rest of tweets
+#START HERE: join sample tweets onto rest of tweets
 full_sample <- tweets %>% 
   left_join(sample_tweets, by = "x1") %>%  #get from google sheets
   select(x1, text.x, time.x, name.x, party.x, topic_blm, for_blm.y, against_blm.y) %>% 
