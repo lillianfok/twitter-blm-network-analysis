@@ -42,8 +42,6 @@ s597_combos <- s597_df %>%
 
 ```
 
-
-
 ## We now have an empty edgelist- bring in other data
 
 So far, we have just created an edgelist, but this includes all potential combinations (this is a dyadic dataset with an i node and a j node). We know that senators voted differently, so we need to merge in the vote data (or whatever data you are using) in order to drop potential ties that do not exist. So, we create two dataframes, one for the sender (i) and one for the receiver (j).
@@ -116,5 +114,3 @@ set.vertex.attribute(x = net_senate, attrname = "party_id", val = df$party)
 
 plot(net_senate, label=network.vertex.names(net_senate), color = )
 ```
-
-
