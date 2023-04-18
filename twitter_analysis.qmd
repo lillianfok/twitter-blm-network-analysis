@@ -18,8 +18,8 @@ library(rquery)
 set.seed(2023)
 
 tweets <- read_csv("data/senator_twitter_May-Oct.csv")
-
 sample <- read_csv("data/full-labelled-sample.csv")
+blm_sample <- read_csv("data/labelled-blm-sample.csv")
 ```
 
 
@@ -204,7 +204,7 @@ d_test[which(d_test$topic_blm == 1 & predictions == 0),][,] %>% View
 # Classify opinions
 
 ```{r}
-additional_blm_tweets <- read_csv("data/blm-sample.csv")
+additional_blm_tweets <- read_csv("data/labelled-blm-sample.csv")
 
 #merge with other labelled sample
 

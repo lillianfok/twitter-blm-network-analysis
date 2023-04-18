@@ -13,6 +13,7 @@ library(writexl)
 library(textTools)
 library(rio)
 library(statnet)
+library(network)
 
 reporting <- read_xlsx("data/state-decert-reporting-bills.xlsx")
 duty_to <- read_xlsx("data/state-duty-to-bills.xlsx")
@@ -127,9 +128,10 @@ combos <- bills %>%
 edge_list <- joined_data
 ```
 
+## Calculate shared policy adoption
+```{r}
+edge_list
 
-```{r, message=F, warning=F}
-library(network)
 ```
 
 
