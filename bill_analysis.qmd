@@ -1,0 +1,31 @@
+---
+title: "state bill analysis"
+format: html
+editor: visual
+---
+
+## State Policing Reform Analysis
+
+```{r}
+library(tidyverse)
+library(readxl)
+library(textTools)
+
+reporting <- read_xlsx("data/state-reporting-bills.xlsx")
+duty_to <- read_xlsx("data/state-duty-to-bills.xlsx")
+use_of_force <- read_xlsx("data/state-use-of-force-bills.xlsx")
+```
+
+```{r}
+View(reporting)
+View(duty_to)
+View(use_of_force)
+
+duty_to <- duty_to %>% 
+  separate(state, "state")
+  
+use_of_force <- use_of_force %>%
+     mutate(across(`ban-chokeholds`:`require-reporting-federal`, ~ replace(., !is.na(.), "1")))
+
+```
+

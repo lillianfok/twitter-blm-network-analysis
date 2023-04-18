@@ -1,0 +1,31 @@
+---
+title: "smote analysis"
+format: html
+editor: visual
+---
+
+## 
+
+```{r}
+library(caret)
+library(e1071)
+library(rpart)
+library(tm)
+library(DMwR)
+
+set.seed(2023)
+
+tweets <- read_csv("data/senator_twitter_May-Oct.csv")
+
+sample <- read_csv("data/full-labelled-sample.csv")
+
+require(devtools)
+install_version("tm", version = "0.7-1", repos = "http://cran.us.r-project.org")
+```
+
+## create corpus
+```{r}
+corpus <- VCorpus(VectorSource(tweets$text),  readerControl = list(language = "en"))
+content(MyCorpus[[1]])
+```
+
