@@ -1,0 +1,159 @@
+---
+title: "state bill analysis"
+format: html
+editor: visual
+---
+
+## State Policing Reform Analysis
+
+```{r}
+library(tidyverse)
+library(readxl)
+library(writexl)
+library(textTools)
+library(rio)
+library(statnet)
+
+reporting <- read_xlsx("data/state-decert-reporting-bills.xlsx")
+duty_to <- read_xlsx("data/state-duty-to-bills.xlsx")
+use_of_force <- read_xlsx("data/state-use-of-force-bills.xlsx")
+```
+
+## Clean and merge data
+```{r}
+#convert to binary indicator
+use_of_force <- use_of_force %>% 
+  mutate(across(`ban-chokeholds`:`require-reporting-federal`, ~ replace(., !is.na(.), "1"))) %>% 
+  rename(`req-report-fed-force` = `require-reporting-federal`) %>% 
+  rename(`req-report-state-force` = `require-reporting-state`)
+
+#create state column
+duty_to <- duty_to %>% 
+  separate(state, "state")
+  
+#join df 1 and 2
+joined <- reporting %>% 
+  full_join(duty_to, by = "state")
+
+#join df 3
+bills <- joined %>% 
+  full_join(use_of_force, by = "state") #26 states total
+
+#get 50 state ids
+state_ids <- as.data.frame(state.abb)
+colnames(state_ids) <- c('state')
+  
+#add rest of states
+bills <- state_ids %>% 
+  full_join(bills, by = "state")
+```
+
+
+## Make copies of variables
+```{r}
+bills <- bills %>% 
+  rename(`req-report-state` = `require-reporting-state`) %>%
+  rename(`req-report-fed` = `require-reporting-federal`) %>% 
+  rename(`req-database` = `require-database`)
+  
+bills <- bills %>% 
+  mutate(`state-j` = state) %>% 
+  mutate(`create-centralized-j` = `create-centralized`) %>% 
+  mutate(`decertification-j` = decertification) %>% 
+  mutate(`req-report-state-j` = `req-report-state`) %>%
+  mutate(`req-report-fed-j` = `req-report-fed`) %>% 
+  mutate(`req-database-j` = `req-database`) %>% 
+  mutate(`duty-intervene-j` = `duty-intervene`) %>% 
+  mutate(`duty-report-j` = `duty-report`) %>% 
+  mutate(`duty-aid-j` = `duty-aid`) %>% 
+  mutate(`sanctions-j` = sanctions) %>% 
+  mutate(`ban-chokeholds-j` = `ban-chokeholds`) %>% 
+  mutate(`restrict-chokeholds-j` = `restrict-chokeholds`) %>% 
+  mutate(`restrict-force-fleeing-j` = `restrict-force-fleeing`) %>% 
+  mutate(`fatal-force-policy-j` = `fatal-force-policy`) %>% 
+  mutate(`req-report-state-force-j` = `req-report-state-force`) %>% 
+  mutate(`req-report-fed-force-j` = `req-report-fed-force`)
+
+```
+
+## Create all possible combinations of states
+```{r}
+combos <- bills %>% 
+  expand(state, `state-j`) %>% 
+  filter(state != `state-j`) #remove self ties
+#resulting df of 51*50 rows 
+```
+
+## Create and combine i and j nodes
+```{r}
+ DF1 <- bills %>% 
+   select(state,
+          `create-centralized`,
+          decertification,
+          `req-report-state`,
+          `req-report-fed`,
+          `req-database`,
+          `duty-intervene`,
+          `duty-report`,
+          `duty-aid`,
+          sanctions,
+          `ban-chokeholds`,
+          `restrict-chokeholds`,
+          `fatal-force-policy`,
+          `req-report-state-force`,
+          `req-report-fed-force`)
+
+ DF2 <- bills |>
+   select(`state-j`,
+          `create-centralized-j`,
+          `decertification-j`,
+          `req-report-state-j`,
+          `req-report-fed-j`,
+          `req-database-j`,
+          `duty-intervene-j`,
+          `duty-report-j`,
+          `duty-aid-j`,
+          `sanctions-j`,
+          `ban-chokeholds-j`,
+          `restrict-chokeholds-j`,
+          `fatal-force-policy-j`,
+          `req-report-state-force-j`,
+          `req-report-fed-force-j`)
+
+ ### Merge data
+ joined_data <- left_join(combos, DF1, by = "state")
+  joined_data <- left_join(joined_data, DF2, by = "state-j")
+  
+edge_list <- joined_data
+```
+
+
+```{r, message=F, warning=F}
+library(network)
+```
+
+
+## Create network
+```{r}
+nv <- nrow(bills)
+net_bills <-network.initialize(nv) #empty network
+#name vertices
+network.vertex.names(x=net_bills) <- bills$state
+
+bills_el <- edge_list %>% 
+  select(state, `state-j`)
+net_bills[as.matrix(bills_el)] <- 1
+```
+
+```{r}
+plot(net_bills, label=network.vertex.names(net_bills))
+
+```
+
+```{r}
+set.vertex.attribute(x=net_bills,attrname="state_id",val=bills$state) 
+
+
+```
+
+How to add tie attributes?
