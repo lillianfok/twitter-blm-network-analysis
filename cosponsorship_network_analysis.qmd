@@ -122,5 +122,3 @@ names<- df1 %>%
 senator_tweets <- tweets %>% 
   filter(name == "Elizabeth Warren")
 ```
-
-
