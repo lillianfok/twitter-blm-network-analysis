@@ -269,6 +269,122 @@ reform policy.
 
 \(\text{Hypothesis}_3: \text{A state governor tweeting about BLM will positively correlate with that} \\ \text{state adopting some level of police reform policy.}\)
 
+\hypertarget{methods}{%
+\section{Methods}\label{methods}}
+
+\(\hspace{.5cm}\) The first dataset contains full Twitter data of US
+state governors over the period of May 1, 2020 to October 31, 2020. It
+was acquired from the open dataset by Zhaozhi Li and Chenglin Zhang from
+an article titled ``Senators' Response to Black Lives Matter during the
+2020 Election Campaign: Evidence from Twitter''. The original web
+scraping was conducted using the Selenium Python package. The dataset
+includes 30,490 tweets with the associated governor name, party, Twitter
+account, time, and text. The text contains the main body of the tweet as
+well as any hashtags (e.g.~\#BackTheBlue, \#BlackLivesMatter,
+\#COVID19).
+
+The time period of the tweet data overlaps with the murder of George
+Floyd by police officer Derek Chauvin on May 25, 2020, an event that
+incited nationwide and global protests in the following months against
+police brutality, white supremacy, and structural racism under the
+common message: Black Lives Matter. The demands of these community-led
+uprisings included calls to ``Defund the Police,'' restructuring local
+budgets and law enforcement and instead invest in community programs
+such as mental health responders, supportive housing, and violence
+prevention.
+
+Joint methods of key term identification and binary classification were
+used to label the full set of tweets with the binary designation of
+content relating to George Floyd, the Black Lives Matter movement, or
+policing. {[}more theory here?{]} From here, we will use ``on topic'' to
+refer to text that represents any of these connected topics.
+
+on\_topic \textless- c(`Floyd', `Breonna', `Breonna Taylor', `BLM',
+`blm', `Black Lives Matter', `lack lives matter', `protest', `justice',
+`racis', `law enforcement', `police', `\#BackTheBlue')
+
+off\_topic \textless- c(`COVID', `virus', `social distanc',
+`nurse',`hospital', `health', `mask', `testing', `unemployment',
+`schools', `positive', `PPE', `ballot', `vote', `census', `symptom',
+`pandemic', `econom', `octor')
+
+These were then sub-categorized as aligned with or against the broad
+demands of the Black Lives Matter movement. Pro- tweets encompassed
+those sympathetic to George Floyd, Breonna Taylor, and other victims of
+police brutality; messaging regarding police reforms or defunding;
+anti-racist and pro-equality statements. Anti- tweets decried the need
+for mass protest and civil unrest; contained expressions of support for
+law enforcement; or denigrated the legitimacy of the movement.
+
+We employed a topic classification algorithm using {[}{]} and N-fold
+cross validation. Topic classification, otherwise known as text
+classification, is a supervised text mining method and a sub-field of
+natural language processing (NLP) machine learning. As a supervised The
+model was trained on a sample of approximately 3,500 hand-labeled
+tweets. Each instance could be a) on topic, b)
+pro-BLM/pro-reform/anti-police, and/or c) pro-police/anti-BLM. Most
+tweets could be categorized into either of the latter two groups.
+
+@(Jay Inslee): ``Together, we grieve for the death of George Floyd, and
+many, many others. The events in Minnesota and across the nation the
+past few nights have been stunning and illustrate how inequity causes
+people to lose faith in their public institutions.''
+
+@(Bill Lee): ``Approaches that would result in the total upheaval of
+police are not the right approach to these real and challenging issues.
+We support law enforcement in Tennessee, and I have the utmost respect
+for these men and women who serve their communities every day.''
+
+Some politicians expressed sentiments from both groups at the same time.
+\citet{NC_Governor} (Roy Cooper): ``It's critical that our state law
+enforcement be leaders in repairing this breach. They have a tough job
+and I'm grateful for so many of them who are doing their best to protect
+and serve with fairness. Many are now acknowledging that systemic and
+cultural changes must be made.''
+
+Due to the sometimes ambiguous nature and expression of political
+ideologies, these categories do not fully encompass all that is put
+forth in a politician's social media content. A tweet advocating for
+policing transparency may also encourage additional support for the law
+enforcement branch making those changes in the same breath. Would such a
+tweet be aligned with the movement calls for reform, or against the
+demands for defunding? Such contradictions fall within the mixed goals
+of a grassroots-organized movement. We ran a binary classification
+algorithm on each of the three topic groups to annotate tweets with
+none, one, or multiple labels.
+
+The state legislative data is sourced from the Brennan Center for
+Justice, a nonpartisan law and policy institute. The dataset contains
+records of state-by-state enactment of bills within three areas of
+policing reform: use of force; duty for officers to intervene, report,
+or render medical aid in instances of police misconduct; and policies
+relating to law enforcement misconduct reporting and decertification.
+All 50 states have adopted some form of legislation relating to at least
+of the identified policy areas within the time period of May 25, 2020 to
+May 21, 2021. The use of force category of bills restricts or specifies
+the type of physical force police officers are allowed to employ in
+certain situations. Duty to intervene policies establish responsibility
+for officers to intervene in cases where they witness use of excessive
+force, and penalties for failure to do so. Finally, decertification \&
+centralized misconduct reporting bills establish or centralize state
+misconduct reports that may result in an officer being decertified and
+removed from duty.
+
+The 50 states are represented as an undirected network, with the degree
+of similarity between the states among a group of 15 potential policies
+of policing reform. Similar to policy diffusion networks, weighted ties
+connect states with shared state policies. We investigate the
+relationship between our dependent variable of inter-state legislative
+similarity with independent variable attributes of the social media
+agenda setting of state governors. We find the frequency of on topic
+tweeting, relative ratio to total tweets, and amount of positive or
+negative opinion. While increased frequency is hypothesized to correlate
+with adoption of legislation, certain legislators produce a much greater
+volume of tweets than others. The topical makeup of their social media
+statements may signify legislative priorities, and whether or not that
+politician is highly motivated to take action on issues of criminal
+justice.
+
 \bibliographystyle{agsm}
 \bibliography{bibliography.bib}
 
