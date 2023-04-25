@@ -24,6 +24,7 @@ blm_sample <- read_csv("data/labelled-blm-sample.csv")
 
 
 # Data wrangling 
+
 ```{r}
 tweets <- tweets %>% 
 #  sample_n(1500) %>% 
@@ -66,7 +67,6 @@ full_sample$...2 <- NULL
 
 write.csv(full_sample, "data/full-labelled-sample.csv")
 write.csv(tweets_blm_filtered, "data/blm-sample.csv")
-
 ```
 
 
@@ -81,6 +81,7 @@ d_test <- full_sample[-train,]
 
 # Define dictionary function
 credit https://www.r-bloggers.com/2021/11/detecting-topics-in-mails-tweets-etc-how-to-create-a-text-classification-algorithm-in-r/ 
+
 ```{r}
 create_dictionary <- function(data){
   corpus <- data$text
@@ -107,14 +108,16 @@ create_dictionary <- function(data){
 
 
 # Create dictionary on training data
+
 ```{r}
 dict_train <- create_dictionary(d_train)
 ```
 
 
 # Define document-term-matrix function
+
 ```{r}
-create_dtm <- function(data, dict){
+create_dtm <- function(data, dict) {
   corpus <- data$text
   
   #Repeat pre-processing from above
@@ -204,9 +207,68 @@ d_test[which(d_test$topic_blm == 1 & predictions == 0),][,] %>% View
 # Classify opinions
 
 ```{r}
-additional_blm_tweets <- read_csv("data/labelled-blm-sample.csv")
+additional_blm_tweets <- read_csv("data/labelled-blm-sample.csv") |>
+  select(-1) |>
+  rename(id = "x1")
 
-#merge with other labelled sample
+sample_clean <- sample |>
+  select(-c(1, 2)) |>
+  rename(id = "x1")
+
+#merge with other labeled sample
+merged <- rbind(sample_clean, additional_blm_tweets)
+merged <- merged |>
+  mutate(topic = case_when(topic_blm == 0 ~ "irrelevant",
+                   (for_blm == 1 & against_blm == 1) ~ "for and against",
+                   for_blm == 1 ~ "for",
+                   against_blm == 1 ~ "against",
+                   topic_blm == 1 ~ "blm"
+                   ),
+         topic_numeric = case_when(topic == "irrelevant" ~ 0,
+                                   topic == "blm" ~ 1,
+                                   topic == "for" ~ 2,
+                                   topic == "against" ~ 3,
+                                   topic == "for and against" ~ 4
+                                   )
+  )
+```
+
+```{r}
+# split into train and test
+train_pf <- sample(1:nrow(merged), round(0.7*nrow(merged),0), F)
+d_train_pf <- merged[train,]
+d_test_pf <- merged[-train,]
+```
+
+```{r}
+dict_train_pf <- create_dictionary(d_train_pf)
+```
+
+```{r}
+dtm_train_pf <- create_dtm(d_train_pf, dict_train_pf)
+```
+
+
+```{r}
+# train the model
+# https://rpubs.com/mharris/multiclass_xgboost
+
+xgb_params <- list("objective" = "multi:softprob",
+                   "eval_metric" = "mlogloss",
+                   "num_class" = 5)
+train_model_pf <- function(data, dtm, target_topic) {
+  
+ t <- factor(unlist(data[,target_topic]), levels=c(0, 1, 2, 3, 4))
+ 
+ caret::train(dtm, t, method="xgbTree",
+                     trControl = trainControl(method="cv", number=5, 
+                                              search = "random", 
+                                              verboseIter=T))
+}
+
+mod <- train_model_pf(d_train_pf, dtm_train_pf, "topic_numeric")
+mod
+
 
 ```
 
