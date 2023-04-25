@@ -214,7 +214,7 @@ set.vertex.attribute(x=net_bills,attrname="state_id",val=bills$state)
 #is this right
 set.edge.attribute(x=net_bills, attrname = "score", val = edge_list$score)
 
-bill.val <- as.edgelist.matrix(edge_list,attrname="collab")
+#bill.val <- as.edgelist.matrix(edge_list,attrname="collab")
 
 gplot(net_bills, 
       vertex.col= "blue", 
