@@ -130,8 +130,61 @@ edge_list <- joined_data
 
 ## Calculate shared policy adoption
 ```{r}
-edge_list
+#convert all numeric columns to int 
+edge_list <- type.convert(edge_list, as.is = TRUE)
 
+char_variable <- edge_list %>% 
+  select(state, `state-j`, sanctions, `sanctions-j`)
+
+#remove char columns
+edge_list <- edge_list %>% 
+  subset(select = -c(sanctions, `sanctions-j`))
+  
+#sub 0s for NAs
+edge_list[is.na(edge_list)] <- 0 
+
+#merge columns back in
+edge_list <- edge_list %>% 
+  full_join(char_variable, by = c("state", "state-j"))
+
+#calculate binary shared policy adoption variables
+edge_list <- edge_list %>% 
+  mutate(`create-centralized-shared` = ifelse(`create-centralized` + `create-centralized-j`== 2, 1, 0)) %>% 
+  mutate(`decertification-shared` = ifelse(`decertification` + `decertification-j`== 2, 1, 0)) %>% 
+  mutate(`req-report-state-shared` = ifelse(`req-report-state` + `req-report-state-j`== 2, 1, 0)) %>% 
+  mutate(`req-report-fed-shared` = ifelse(`req-report-fed` + `req-report-fed-j`== 2, 1, 0)) %>% 
+  mutate(`req-database-shared` = ifelse(`req-database` + `req-database-j` == 2, 1, 0)) %>%
+  mutate(`duty-intervene-shared` = ifelse(`duty-intervene` + `duty-intervene-j` == 2, 1, 0)) %>%
+  mutate(`duty-report-shared` = ifelse(`duty-report` + `duty-report-j` == 2, 1, 0)) %>% 
+  mutate(`duty-aid-shared` = ifelse(`duty-aid` + `duty-aid-j`== 2, 1, 0)) %>% 
+  mutate(`sanctions-shared` = ifelse(sanctions == `sanctions-j`, 1, 0)) %>% 
+  mutate(`ban-chokeholds-shared` = ifelse(`ban-chokeholds` +`ban-chokeholds-j`== 2, 1, 0)) %>% 
+  mutate(`restrict-chokeholds-shared` = ifelse(`restrict-chokeholds` +`restrict-chokeholds-j`  == 2, 1, 0)) %>% 
+  mutate(`fatal-force-policy-shared` = ifelse(`fatal-force-policy` +`fatal-force-policy-j`  == 2, 1, 0)) %>% 
+  mutate(`req-report-state-force-shared` = ifelse(`req-report-fed-force` + `req-report-fed-force-j`  == 2, 1, 0)) %>%
+  mutate(`req-report-fed-force-shared` = ifelse(`req-report-fed-force` +  `req-report-fed-force-j` == 2, 1, 0)) 
+           
+#fill in sanctions shared column
+edge_list <- edge_list %>% 
+  mutate(`sanctions-shared` = coalesce(`sanctions-shared`, 0))
+
+#calculate sum policy adoption similarity score
+edge_list <- edge_list %>% 
+  mutate(score = `create-centralized-shared` + 
+           `decertification-shared` +
+           `req-report-state-shared`+
+           `req-report-fed-shared` +
+           `req-database-shared` +
+           `duty-intervene-shared`+
+           `duty-report-shared` +
+           `duty-aid-shared` +
+           `sanctions-shared` +
+           `ban-chokeholds-shared` +
+           `restrict-chokeholds-shared` +
+           `fatal-force-policy-shared` +
+           `req-report-state-force-shared` +
+           `req-report-fed-force-shared`) %>% 
+  subset(select = -c(sanctions, `sanctions-j`))
 ```
 
 
@@ -152,10 +205,35 @@ plot(net_bills, label=network.vertex.names(net_bills))
 
 ```
 
-```{r}
-set.vertex.attribute(x=net_bills,attrname="state_id",val=bills$state) 
 
+##### PLOTTING STATNET NETWORK HERE #####
+
+```{r}
+set.vertex.attribute(x=net_bills,attrname="state_id",val=bills$state)
+
+#is this right
+set.edge.attribute(x=net_bills, attrname = "score", val = edge_list$score)
+
+#bill.val <- as.edgelist.matrix(edge_list,attrname="collab")
+
+gplot(net_bills, 
+      vertex.col= "blue", 
+      edge.col = "grey80", 
+      edge.lwd=0.5, 
+      gmode = "graph", 
+      displaylabels = TRUE, 
+      mode="fruchtermanreingold")
 
 ```
 
-How to add tie attributes?
+## Convert to igraph
+```{r}
+library(intergraph)
+detach(package:statnet)
+library(igraph)
+
+igraph <- asIgraph(net_bills)
+
+plot(igraph, layout = layout_in_circle)
+```
+
