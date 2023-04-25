@@ -183,7 +183,8 @@ edge_list <- edge_list %>%
            `restrict-chokeholds-shared` +
            `fatal-force-policy-shared` +
            `req-report-state-force-shared` +
-           `req-report-fed-force-shared`)
+           `req-report-fed-force-shared`) %>% 
+  subset(select = -c(sanctions, `sanctions-j`))
 ```
 
 
@@ -204,12 +205,35 @@ plot(net_bills, label=network.vertex.names(net_bills))
 
 ```
 
+
+##### PLOTTING STATNET NETWORK HERE #####
+
 ```{r}
 set.vertex.attribute(x=net_bills,attrname="state_id",val=bills$state)
 
 #is this right
 set.edge.attribute(x=net_bills, attrname = "score", val = edge_list$score)
 
+bill.val <- as.edgelist.matrix(edge_list,attrname="collab")
+
+gplot(net_bills, 
+      vertex.col= "blue", 
+      edge.col = "grey80", 
+      edge.lwd=0.5, 
+      gmode = "graph", 
+      displaylabels = TRUE, 
+      mode="fruchtermanreingold")
+
 ```
 
-## Plot using igraph?
+## Convert to igraph
+```{r}
+library(intergraph)
+detach(package:statnet)
+library(igraph)
+
+igraph <- asIgraph(net_bills)
+
+plot(igraph, layout = layout_in_circle)
+```
+
