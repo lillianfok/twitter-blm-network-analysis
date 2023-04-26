@@ -21,9 +21,6 @@ sample <- read_csv("data/full-labelled-sample.csv")
 blm_sample <- read_csv("data/labelled-blm-sample.csv")
 ```
 
-```{r}
-for_terms <- c("backtheblue")
-```
 
 ## Define dictionary function
 credit https://www.r-bloggers.com/2021/11/detecting-topics-in-mails-tweets-etc-how-to-create-a-text-classification-algorithm-in-r/ 
@@ -162,6 +159,11 @@ d_test[which(d_test$for_blm == 1 & predictions == 0),][,] %>% View
 ## Save positive predictions 
 ```{r}
 pro_blm_predictions <- blm_tweets[which(predictions == 1),][,] 
+
+pro_blm_predictions <- pro_blm_predictions %>% 
+  subset(select = -c(against_blm)) %>% 
+  mutate(pro_blm = 1)
+
 
 #write.csv(pro_blm_predictions, "data/pro-blm-predictions.csv")
 ```
