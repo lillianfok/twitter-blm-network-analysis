@@ -184,7 +184,12 @@ edge_list <- edge_list %>%
            `fatal-force-policy-shared` +
            `req-report-state-force-shared` +
            `req-report-fed-force-shared`) %>% 
-  subset(select = -c(sanctions, `sanctions-j`))
+  subset(select = -c(sanctions, `sanctions-j`)) 
+
+edge_list_no_na <- edge_list%>% 
+  filter(score > 1)
+
+hist(edge_list_no_na$score)
 ```
 
 
@@ -195,7 +200,7 @@ net_bills <-network.initialize(nv) #empty network
 #name vertices
 network.vertex.names(x=net_bills) <- bills$state
 
-bills_el <- edge_list %>% 
+bills_el <- edge_list_no_na %>% 
   select(state, `state-j`)
 net_bills[as.matrix(bills_el)] <- 1
 ```
