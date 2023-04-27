@@ -54,7 +54,7 @@ tweets_blm_filtered <- tweets_blm_filtered %>%
 full_sample <- sample %>% 
   natural_join(tweets_blm_filtered, by = "x1", jointype = "FULL") %>% 
   mutate(text = tolower(text)) %>% 
-  subset(select = -c(...1,...2))
+  subset(select = -c(...1))
 
 #full_sample$...1 <- NULL
 #full_sample$...2 <- NULL

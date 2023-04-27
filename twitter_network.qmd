@@ -1,0 +1,47 @@
+---
+title: "twitter network"
+format: html
+editor: visual
+---
+
+## Twitter Network Analysis 
+
+```{r}
+library(tidyverse)
+library(statnet)
+library(janitor)
+library(rquery)
+
+blm_topic_df <- read_csv("data/topic-blm-predictions.csv")
+pro_blm_df <- read_csv("data/pro-blm-predictions.csv")
+tweets_df <- read_csv("raw-data/governor_twitter_May-Oct.csv")
+sample_df <- read_csv("data/full-labelled-sample.csv")
+```
+
+```{r}
+#merge topic and pro dfs
+merged_df <- blm_topic_df %>% 
+  natural_join(pro_blm_df, by = c("x1", "text", "time", "name", "party"), 
+               jointype = "FULL") %>% 
+  subset(select = -c(...1)) %>% 
+  replace_na(list(pro_blm = 0, topic_blm = 0)) %>% 
+  select(x1, topic_blm, pro_blm)
+
+#assign to full dataset
+full_tweets_df <- tweets_df %>% 
+  clean_names() %>% 
+  natural_join(merged_df, by = "x1")
+  
+#use sample labels to overwrite
+full_tweets_df <- sample_df %>% 
+  subset(select = -c(against_blm, ...1)) %>% 
+  full_join(full_tweets_df, by = "x1") %>% 
+  #sample: for_blm, topic_blm.x
+  mutate(pro_blm = case_when(for_blm == 1 ~ 1,
+                             ))
+
+#classify by state name 
+#df of difference in ratio 
+#merge with existing edge list 
+```
+

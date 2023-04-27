@@ -21,6 +21,7 @@ use_of_force <- read_xlsx("data/state-use-of-force-bills.xlsx")
 ```
 
 ## Clean and merge data
+
 ```{r}
 #convert to binary indicator
 use_of_force <- use_of_force %>% 
@@ -49,8 +50,8 @@ bills <- state_ids %>%
   full_join(bills, by = "state")
 ```
 
-
 ## Make copies of variables
+
 ```{r}
 bills <- bills %>% 
   rename(`req-report-state` = `require-reporting-state`) %>%
@@ -78,6 +79,7 @@ bills <- bills %>%
 ```
 
 ## Create all possible combinations of states
+
 ```{r}
 combos <- bills %>% 
   expand(state, `state-j`) %>% 
@@ -86,6 +88,7 @@ combos <- bills %>%
 ```
 
 ## Create and combine i and j nodes
+
 ```{r}
  DF1 <- bills %>% 
    select(state,
@@ -129,6 +132,7 @@ edge_list <- joined_data
 ```
 
 ## Calculate shared policy adoption
+
 ```{r}
 #convert all numeric columns to int 
 edge_list <- type.convert(edge_list, as.is = TRUE)
@@ -192,8 +196,8 @@ edge_list_no_na <- edge_list%>%
 hist(edge_list_no_na$score)
 ```
 
-
 ## Create network
+
 ```{r}
 nv <- nrow(bills)
 net_bills <-network.initialize(nv) #empty network
@@ -210,8 +214,7 @@ plot(net_bills, label=network.vertex.names(net_bills))
 
 ```
 
-
-##### PLOTTING STATNET NETWORK HERE #####
+##### PLOTTING STATNET NETWORK HERE
 
 ```{r}
 set.vertex.attribute(x=net_bills,attrname="state_id",val=bills$state)
@@ -232,6 +235,7 @@ gplot(net_bills,
 ```
 
 ## Convert to igraph
+
 ```{r}
 library(intergraph)
 detach(package:statnet)
@@ -241,4 +245,5 @@ igraph <- asIgraph(net_bills)
 
 plot(igraph, layout = layout_in_circle)
 ```
+
 

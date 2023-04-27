@@ -1,0 +1,23 @@
+---
+title: "states_network"
+format: html
+editor: visual
+---
+
+## States Network and Regression
+
+```{r}
+library(tidyverse)
+library(igraph)
+
+## Load state characteristics
+states <- read_csv("full_edgelist.csv")
+
+```
+
+Get variables:
+race, income, urban index, ideology, population?
+```{r}
+
+```
+
