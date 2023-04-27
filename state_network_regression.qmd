@@ -11,7 +11,7 @@ library(tidyverse)
 library(igraph)
 
 ## Load state characteristics
-states <- read_csv("full_edgelist.csv")
+states <- read_csv("raw-data/state-traits-edgelist.csv")
 
 ```
 

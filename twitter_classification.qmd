@@ -22,31 +22,15 @@ sample <- read_csv("data/full-labelled-sample.csv")
 blm_sample <- read_csv("data/labelled-blm-sample.csv")
 ```
 
-
-# Data wrangling 
+# Data wrangling
 
 ```{r}
-tweets <- tweets %>% 
-#  sample_n(1500) %>% 
-  clean_names() %>% 
-  select(x1, text, time, name, party) %>%
-  add_column(for_blm = NA) %>% 
-  add_column(against_blm = NA) 
 
 off_topic <- c('COVID', 'virus', 'social distanc', 'nurse','hospital', 'health', 'mask', 'testing', 'unemployment', 'schools', 'positive', 'PPE', 'ballot', 'vote', 'census', 'symptom', 'pandemic', 'econom', 'Doctor')
-
-on_topic <- c('Floyd', 'Breonna', 'Breonna Taylor', 'BLM', 'blm', 'Black Lives Matter', 'lack lives matter', 'protest', 'justice', 'racis', 'law enforcement', 'police', '#BackTheBlue')
 
 #filter out unrelated tweets from entire sample
 tweets_filtered <- tweets %>% 
   filter(!grepl(paste(off_topic, collapse = "|"), text))
-
-########try filtering out from sample too
-# sample <- sample %>% 
-#   filter(!grepl(paste(off_topic, collapse = "|"), text))
-# 
-# sample$...1 <- NULL
-# sample$...2 <- NULL
 
 #label positive tweets out of possible tweets
 tweets_blm_filtered <- tweets_filtered %>% 
@@ -69,8 +53,8 @@ full_sample$...2 <- NULL
 #write.csv(tweets_blm_filtered, "data/blm-sample.csv")
 ```
 
-
 #Divide into training and testing samples
+
 ```{r}
 train <- sample(1:nrow(full_sample), round(0.7*nrow(full_sample),0), F)
 
@@ -78,9 +62,9 @@ d_train <- full_sample[train,]
 d_test <- full_sample[-train,]
 ```
 
-
 # Define dictionary function
-credit https://www.r-bloggers.com/2021/11/detecting-topics-in-mails-tweets-etc-how-to-create-a-text-classification-algorithm-in-r/ 
+
+credit https://www.r-bloggers.com/2021/11/detecting-topics-in-mails-tweets-etc-how-to-create-a-text-classification-algorithm-in-r/
 
 ```{r}
 create_dictionary <- function(data){
@@ -106,13 +90,11 @@ create_dictionary <- function(data){
 }
 ```
 
-
 # Create dictionary on training data
 
 ```{r}
 dict_train <- create_dictionary(d_train)
 ```
-
 
 # Define document-term-matrix function
 
@@ -142,14 +124,14 @@ create_dtm <- function(data, dict) {
 }
 ```
 
-
 # Create DTM
+
 ```{r}
 dtm_train <- create_dtm(d_train, dict_train)
 ```
 
-
 # Define binary classification algorithm
+
 ```{r}
 train_model <- function(data, dtm, target_topic){
  t <- factor(unlist(data[,target_topic]), levels=c(1,0))
@@ -161,16 +143,16 @@ train_model <- function(data, dtm, target_topic){
 }
 ```
 
-
 # Run classification
+
 ```{r}
 set.seed(2023)
 mod <- train_model(d_train, dtm_train, "topic_blm")
 mod
 ```
 
-
 # Define evaluation function
+
 ```{r}
 evaluate_model <- function(model, data_test, dict, target_topic){
   t <- factor(unlist(data_test[,target_topic]), levels=c(1,0))
@@ -182,14 +164,14 @@ evaluate_model <- function(model, data_test, dict, target_topic){
 }
 ```
 
-
 #Evaluate model accuracy
+
 ```{r}
 evaluate_model(mod, d_test, dict_train, "topic_blm")
 ```
 
-
 # Check misclassifications
+
 ```{r}
 dtm_test <- create_dtm(d_test, dict_train)
 predictions <- predict(mod, newdata = dtm_test)
@@ -204,8 +186,8 @@ d_test[which(d_test$topic_blm == 1 & predictions == 0),][,] %>% View
 #~96 specificity 
 ```
 
-
 # Run on all data
+
 ```{r}
 #create dictionary of terms on all data
 #dict_full <- create_dictionary(tweets_filtered)
@@ -222,12 +204,6 @@ blm_topic_predictions <- tweets_filtered[which(full_predictions == 1),][,]
 write.csv(blm_topic_predictions, "data/")
 
 ```
-
-
-
-
-
-
 
 # Classify opinions
 
@@ -273,7 +249,6 @@ dict_train_pf <- create_dictionary(d_train_pf)
 dtm_train_pf <- create_dtm(d_train_pf, dict_train_pf)
 ```
 
-
 ```{r}
 # train the model
 # https://rpubs.com/mharris/multiclass_xgboost
@@ -296,5 +271,3 @@ mod
 
 
 ```
-
-
