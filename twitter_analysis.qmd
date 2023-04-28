@@ -50,7 +50,9 @@ governor_tweets_df <- updated_tweets_df %>%
   group_by(name, state) %>% 
   mutate(topic_blm_count = sum(topic_blm)) %>% 
   mutate(pro_blm_count = sum(pro_blm)) %>% 
-  mutate(total_count = n()) 
+  mutate(total_count = n()) %>% 
+  mutate(topic_blm_ratio = topic_blm_count/total_count) %>% 
+  mutate(pro_blm_ratio = pro_blm_count/total_count)
 
 #write.csv(governor_tweets_df, "data/full-labelled-tweets.csv")
 ```

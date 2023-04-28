@@ -15,9 +15,9 @@ library(rio)
 library(statnet)
 library(network)
 
-reporting <- read_xlsx("data/state-decert-reporting-bills.xlsx")
-duty_to <- read_xlsx("data/state-duty-to-bills.xlsx")
-use_of_force <- read_xlsx("data/state-use-of-force-bills.xlsx")
+reporting <- read_xlsx("raw-data/state-decert-reporting-bills.xlsx")
+duty_to <- read_xlsx("raw-data/state-duty-to-bills.xlsx")
+use_of_force <- read_xlsx("raw-data/state-use-of-force-bills.xlsx")
 ```
 
 ## Clean and merge data
@@ -190,6 +190,11 @@ edge_list <- edge_list %>%
            `req-report-fed-force-shared`) %>% 
   subset(select = -c(sanctions, `sanctions-j`)) 
 
+#write.csv(edge_list, "data/edge-list.csv")
+```
+
+```{r}
+#remove NAs for better visualization
 edge_list_no_na <- edge_list%>% 
   filter(score > 1)
 
@@ -245,5 +250,3 @@ igraph <- asIgraph(net_bills)
 
 plot(igraph, layout = layout_in_circle)
 ```
-
-
