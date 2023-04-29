@@ -8,12 +8,13 @@ library(here)
 library(rio)
 # quick list of states
 library(datasets)
+library(igraph)
 
 # Load data ---------------------------------------------------------------
 
 i_am("analysis/control-variable-processing.R")
 
-governor_data <- import(here("data/senator_twitter_May-Oct.csv"))
+governor_data <- import(here("raw-data/governor_twitter_May-Oct.csv"))
 
 # get states present in dataset
 states <- governor_data |>
@@ -54,7 +55,6 @@ binary_gender <- joined_gender |>
   select(state, state_j)
 
 # https://stackoverflow.com/questions/16584948/how-to-create-weighted-adjacency-list-matrix-from-edge-list
-library(igraph)
 gender_graph = graph.data.frame(binary_gender)
 gender_adj = get.adjacency(gender_graph, sparse = TRUE)
 
@@ -118,7 +118,7 @@ age_mat <- as.matrix(age_adj)
 
 bill_edge <- import(here("data/bill_edgelist.Rds"))
 
-states_to_filter <- setdiff(rownames(bill_mat), states)
+states_to_filter <- setdiff(unique(bill_edge$state), states)
 
 bill_edge_filtered <- bill_edge |>
   filter(!(state %in% states_to_filter), !(state_j %in% states_to_filter))
@@ -127,21 +127,84 @@ bill_graph = graph.data.frame(bill_edge_filtered)
 bill_adj = get.adjacency(bill_graph, sparse = TRUE, attr = "score")
 bill_mat <- as.matrix(bill_adj)
 
+
+
+# BLM Tweets --------------------------------------------------------------
+
+governor_tweets <- import(here("data/full-labelled-tweets.csv"))
+
+blm <- governor_tweets |>
+  rename(blm_prop = "topic_blm_ratio") |>
+  select(name, state, blm_prop) |>
+  filter(!duplicated(name)) |>
+  mutate(state_j = state,
+         blm_prop_j = blm_prop,
+         )
+
+blm_1 <- blm |>
+  select(state, blm_prop)
+
+blm_2 <- blm |>
+  select(state_j, blm_prop_j)
+
+# Merge data
+joined_blm <- left_join(combos, blm_1, by = "state")
+joined_blm <- left_join(joined_blm, blm_2, by = "state_j")
+
+edge_blm <- joined_blm |>
+  mutate(prop_diff = abs(blm_prop - blm_prop_j)) |>
+  select(state, state_j, prop_diff)
+
+blm_graph = graph.data.frame(edge_blm)
+blm_adj = get.adjacency(blm_graph, sparse = TRUE, attr = "prop_diff")
+blm_mat <- as.matrix(blm_adj)
+
+
+# Pro-BLM Tweets ----------------------------------------------------------
+
+pro_blm <- governor_tweets |>
+  rename(pro_blm_prop = "pro_blm_ratio") |>
+  select(name, state, pro_blm_prop) |>
+  filter(!duplicated(name)) |>
+  mutate(state_j = state,
+         pro_blm_prop_j = pro_blm_prop,
+  )
+
+pro_blm_1 <- pro_blm |>
+  select(state, pro_blm_prop)
+
+pro_blm_2 <- pro_blm |>
+  select(state_j, pro_blm_prop_j)
+
+# Merge data
+joined_pro_blm <- left_join(combos, pro_blm_1, by = "state")
+joined_pro_blm <- left_join(joined_pro_blm, pro_blm_2, by = "state_j")
+
+edge_pro_blm <- joined_pro_blm |>
+  mutate(prop_diff = abs(pro_blm_prop - pro_blm_prop_j)) |>
+  select(state, state_j, prop_diff)
+
+pro_blm_graph = graph.data.frame(edge_pro_blm)
+pro_blm_adj = get.adjacency(pro_blm_graph, sparse = TRUE, attr = "prop_diff")
+pro_blm_mat <- as.matrix(pro_blm_adj)
+
 # Modeling ----------------------------------------------------------------
 
-state_mats <- array(NA, c(3, length(bill_mat[1,]), length(bill_mat[1,])))
+state_mats <- array(NA, c(5, length(bill_mat[1,]), length(bill_mat[1,])))
 
 state_mats[1,,] <- gender_mat
 state_mats[2,,] <- party_mat
 state_mats[3,,] <- age_mat
+state_mats[4,,] <- blm_mat
+state_mats[5,,] <- pro_blm_mat
 
 set.seed(2023)
 
-latent_lm <- netlm(bill_mat, state_mats, reps=100)
+latent_lm <- sna::netlm(bill_mat, state_mats, reps=100)
 
 latent_model <- list()
 latent_model <- summary(latent_lm)
-latent_model$names <- c("Intercept", "Same Gender", "Same Party", "Age Difference")
+latent_model$names <- c("Intercept", "Same Gender", "Same Party", "Age Difference", "BLM Tweet Prop Diff", "Pro-BLM Tweet Prop Diff")
 
 latent_model
 

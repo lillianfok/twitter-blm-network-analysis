@@ -16,15 +16,9 @@ library(statnet)
 library(network)
 library(here)
 
-<<<<<<<< HEAD:analysis/bill_analysis.qmd
 reporting <- read_xlsx(here("data/state-decert-reporting-bills.xlsx"))
 duty_to <- read_xlsx(here("data/state-duty-to-bills.xlsx"))
 use_of_force <- read_xlsx(here("data/state-use-of-force-bills.xlsx"))
-========
-reporting <- read_xlsx("raw-data/state-decert-reporting-bills.xlsx")
-duty_to <- read_xlsx("raw-data/state-duty-to-bills.xlsx")
-use_of_force <- read_xlsx("raw-data/state-use-of-force-bills.xlsx")
->>>>>>>> 8cde7cf05298b67264a9804e40793724308e4dad:bill_network.qmd
 ```
 
 ## Clean and merge data
