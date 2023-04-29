@@ -1,0 +1,170 @@
+---
+title: "twitter opinion analysis"
+format: html
+editor: visual
+---
+
+# Twitter Data Opinion Analysis
+
+```{r}
+library(tidyverse)
+library(stopwords)
+library(purrr)
+library(corpus)
+library(janitor)
+library(caret)
+
+set.seed(2023)
+
+blm_tweets <- read_csv("data/topic-blm-predictions.csv")
+sample <- read_csv("data/full-labelled-sample.csv")
+blm_sample <- read_csv("data/labelled-blm-sample.csv")
+```
+
+
+## Define dictionary function
+credit https://www.r-bloggers.com/2021/11/detecting-topics-in-mails-tweets-etc-how-to-create-a-text-classification-algorithm-in-r/ 
+
+```{r}
+create_dictionary <- function(data){
+  corpus <- data$text
+  
+  #split up words and convert to lowercase
+  corpus <- purrr::map(corpus, function(x) str_split(tolower(x),"\\s+") %>% unlist) 
+  
+  #remove non-letters
+  corpus <- purrr::map(corpus, function(x) gsub("[^a-z]","",x))
+  
+  #remove stop-words ("the", "in", etc.)
+  corpus <- purrr::map(corpus, function(x) x[!(x %in% stopwords::stopwords("en"))])
+  
+  #stem all words (eg sentences -> sentenc)
+  corpus <- purrr::map(corpus, function(x) text_tokens(x, stemmer="en") %>% unlist)
+  
+  #keep only words occurring 20+
+  words <- as.data.frame(sort(table(unlist(corpus)), decreasing=T), stringsAsFactors = F)
+  words <- words$Var1[which(words$Freq >=20)]
+  
+  return(words)  
+}
+```
+
+## Define document-term-matrix function
+
+```{r}
+create_dtm <- function(data, dict) {
+  corpus <- data$text
+  
+  #Repeat pre-processing from above
+  corpus <- purrr::map(corpus, function(x) str_split(tolower(x),"\\s+") %>% unlist) 
+  corpus <- purrr::map(corpus, function(x) gsub("[^a-z]","",x))
+  corpus <- purrr::map(corpus, function(x) x[!(x %in% stopwords::stopwords("en"))])
+  corpus <- purrr::map(corpus, function(x) text_tokens(x, stemmer="en") %>% unlist)
+  
+  #Keep only words from the dictionary
+  corpus <- purrr::map(corpus, function(x) x[x %in% dict])
+  
+  #Make dtm
+  dtm <- as.data.frame(matrix(0L, nrow=nrow(data), ncol=length(dict)))
+  names(dtm) <- dict
+  
+  freq <- purrr::map(corpus, table)
+  for (i in 1:nrow(dtm)){
+    dtm[i, names(freq[[i]])] <- unname(freq[[i]])
+  }
+  
+  return(dtm)
+}
+```
+
+## Define binary classification algorithm
+```{r}
+train_model <- function(data, dtm, target_topic){
+ t <- factor(unlist(data[,target_topic]), levels=c(1,0))
+ 
+ caret::train(dtm, t, method="xgbTree",
+                     trControl = trainControl(method="cv", number=5, 
+                                              search = "random", 
+                                              verboseIter=T))
+}
+```
+
+## Define evaluation function
+```{r}
+evaluate_model <- function(model, data_test, dict, target_topic){
+  t <- factor(unlist(data_test[,target_topic]), levels=c(1,0))
+  dtm_test <- create_dtm(data_test, dict)
+  
+  predictions <- predict(mod, newdata = dtm_test)
+  confusionMatrix(predictions, t)
+  
+}
+```
+
+
+```{r}
+#merge hand labelled samples
+full_sample <- sample %>% 
+  natural_join(blm_sample, by = "x1", jointype = "FULL") %>% 
+  mutate(text = tolower(text)) %>% 
+  subset(select = -c(...1))
+
+#remove NAs
+full_sample <- full_sample %>% 
+  filter(!is.na(for_blm))
+```
+
+```{r}
+#split train and test
+train <- sample(1:nrow(full_sample), round(0.7*nrow(full_sample),0), F)
+
+d_train <- full_sample[train,]
+d_test <- full_sample[-train,]
+```
+
+## Train model
+```{r}
+#create dictionary
+dict_train <- create_dictionary(d_train)
+
+#create document term matrix
+dtm_train <- create_dtm(d_train, dict_train)
+
+#train on for_blm binary variable
+pro_mod <- train_model(d_train, dtm_train, "for_blm")
+pro_mod
+
+#against blm - not very accurate
+anti_mod <- train_model(d_train, dtm_train, "against_blm")
+anti_mod
+
+#check accuracy
+evaluate_model(pro_mod, d_test, dict_train, "for_blm")
+evaluate_model(anti_mod, d_test, dict_train, "against_blm")
+
+```
+
+## Check misclassifications
+```{r}
+dtm_test <- create_dtm(d_test, dict_train)
+predictions <- predict(mod, newdata = dtm_test)
+
+#false positives
+d_test[which(d_test$for_blm == 0 & predictions == 1),][,] %>% View
+
+#false negatives
+d_test[which(d_test$for_blm == 1 & predictions == 0),][,] %>% View
+```
+
+## Save positive predictions 
+```{r}
+pro_blm_predictions <- blm_tweets[which(predictions == 1),][,] 
+
+pro_blm_predictions <- pro_blm_predictions %>% 
+  subset(select = -c(against_blm)) %>% 
+  mutate(pro_blm = 1)
+
+
+#write.csv(pro_blm_predictions, "data/pro-blm-predictions.csv")
+```
+
