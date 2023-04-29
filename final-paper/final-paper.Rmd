@@ -17,7 +17,7 @@ keywords:
 - that do not appear in the title
 
 abstract: |
-  Twitter has become an increasingly used social networking resource for politicians, social movements, and citizens. Politicians often use twitter to communicate with the public, campaign, advocate for themselves and their policies, and send out calls to action. Twitter has also provided a convenient and public way for the public and organizations to call on elected officials to take action on relevant issues facing the public. We investigate whether state governors twitter habits regarding the Black Lives Matter movement correlates with passage of police reform laws in the state policy diffusion network.
+  Twitter has become an increasingly used social networking resource for politicians, social movements, and citizens. Politicians often use twitter to communicate with the public, campaign, advocate for themselves and their policies, and send out calls to action. Twitter has also provided a convenient and public way for the public and organizations to call on elected officials to take action on relevant issues facing the public. We investigate whether state governors twitter habits regarding the Black Lives Matter movement correlates with passage of police reform laws in the state policy diffusion network. NOTE TO READERS: This is still a very rough draft, we are planning to flesh out our discussion and results futher.
 
 bibliography: bibliography.bib
 style: APA
@@ -34,9 +34,9 @@ output: rticles::asa_article
 
 \(\hspace{.5cm}\) Social media has become an increasingly pervasive presence in our daily lives and its impact has been far-reaching. Consequently, social media has been increasingly used in a political context. There are several studies regarding the use of social media in general and in a political context. Many studies have focused on the way politicians use social media, finding that common motivations are a desire to grow their support base (sometimes by inciting an extreme reaction), to disseminate information, and to network with other politicians. @Hemsley finds that in the context of the U.S. 2014 gubernatorial election, candidates for governor used Twitter to advocate for themselves, their policies, what they believe in, and calls-to-action in addition to attacks on their opponents and their policies. Further, Hemsley finds that the the most popular tweets that reach the widest audience are call-to-action and attack tweets. Therefore political candidates wishing to broaden their support base may disproportionately send out attack or call-to-action tweets. In the Korean political context, @Park find that Tweets from leading government officials are more likely to increase citizen perceptions of credibility in a government Twitter feeds and government overall. This use of Twitter as a mechanism for politicians to increase trust in government also appears in the U.S., where @Song find that government use of social media websites increases perceived government transparency and citizens’ trust in government. Notably, Song and Lee’s work used 2009 survey data, and may not be consistent with current public perception of government Twitter feeds, and Park et al.’s work may not be applicable in the U.S. political context. Former U.S. president Donald Trump, the highest elected official in the U.S. from 2016-2020, frequently made false or misleading claims on Twitter, and these false or misleading tweets were among his most popular (Rattner, 2021).
 
-\(\hspace{.5cm}\) The way politicians are using Twitter can also be broken down by party, gender, and incumbency, among other factors. @Evans offer a more granular analysis of how politicians are using Twitter in their study of candidates for the 2012 U.S. House. They find that women tweet more overall and are more likely to criticize their opponents. It may be true that female candidates have to work harder to grow their support base, as they are underrepresented in many areas of U.S. government, and may face gender-specific roadblocks to getting elected (Bos et al., 2018). Paired with Hemsley’s findings, it is possible that female political candidates tweet more opponent-criticizing or “attack” messages in an attempt to produce more viral tweets and grow their support base. However, our study focuses on state governor Tweeting during the height of the Black Lives Matter movement, and thus the findings of Evans et al. may not correlate with trends observed in our data. Additionally, our data was not collected during an election cycle, and thus opponent-attacking and campaigning tweets are likely not as prevalent in the dataset. Pivoting to studying politician use of Twitter specific to the BLM movement, @Panda find that in a study of Tweets from 520 U.S. Congress members that Democrats are more likely to tweet about the movement in general and express their concern for police brutality, while Republicans are less likely to tweet about the movement overall and more likely to express concern about perceived protest violence associated with the movement. Because of these findings, we hypothesize that Democratic governors will be more likely to tweet about BLM and police reform overall.
+\(\hspace{.5cm}\) The way politicians are using Twitter can also be broken down by party, gender, and incumbency, among other factors. @Evans offer a more granular analysis of how politicians are using Twitter in their study of candidates for the 2012 U.S. House. They find that women tweet more overall and are more likely to criticize their opponents. It may be true that female candidates have to work harder to grow their support base, as they are underrepresented in many areas of U.S. government, and may face gender-specific roadblocks to getting elected (Bos et al., 2018). Paired with Hemsley’s findings, it is possible that female political candidates tweet more opponent-criticizing or “attack” messages in an attempt to produce more viral tweets and grow their support base. However, our study focuses on state governor Tweeting during the height of the Black Lives Matter movement, and thus the findings of Evans et al. may not correlate with trends observed in our data. Additionally, our data was not collected during an election cycle, and thus opponent-attacking and campaigning tweets are likely not as prevalent in the dataset. Pivoting to studying politician use of Twitter specific to the BLM movement, @Panda find that in a study of Tweets from 520 U.S. Congress members that Democrats are more likely to tweet about the movement in general and express their concern for police brutality, while Republicans are less likely to tweet about the movement overall and more likely to express concern about perceived protest violence associated with the movement. Because of these findings, we hypothesize that Democrat (and possible female) governors will be more likely to tweet about BLM and police reform overall.
 
-\(\text{Hypothesis}_1: \text{Democrat governors will be more likely to tweet about BLM and police} \\ \text{reform overall.}\)
+\(\text{Hypothesis}_1: \text{Democrat (and female) governors will be more likely to tweet about BLM and police} \\ \text{reform overall.}\)
 
 ## Black Lives Matter movement and Twitter
 
@@ -46,10 +46,11 @@ output: rticles::asa_article
 
 ## State Policy Adoption
 
-\(\hspace{.5cm}\) State policy reform is a complex process that cannot be captured by the actions of an individual state governor alone. There has been much scholarship in the field of policy diffusion and investigation of the factors and underlying network that cause states to adopt certain policies. In their study of the correlation between perceived state similarity and similar policy adoption, @Bricker find that factors like perceived state similarity, legislative professionalism, population size differences, and different partisan control of state legislatures can significantly impact whether a state will adopt a policy similar to a policy  previously adopted by another state. @Desmarais model a latent underlying state policy diffusion network that correlates with media state policy emulation stories, finding that California tops the list, especially in more recent years (2005-2009), as a leading policy innovator. In Gavin Newsom’s tweet regarding California’s passage of new standards for police use of force in 2019, he says the passage “[makes California] a model for the rest of the nation”, highlighting that he likely expects the rest of the states to observe the efficacy of this legislation and adopt it if successful. This showcases an important factor in state policy adoption, learning (proposed by @Shipan), in which states may observe policy efficacy in other states before deciding to implement it themselves. Given the results of Desmarais et al. and Governor Newsom’s statement, it is possible that we will find California to be a policy innovator in our network, adopting more police reform policies than other states. Overall, we know that there is non-independence among states regarding choice of policy adoption, which is something we control for in our analysis by treating state policy adoption as a network object.
-
+\(\hspace{.5cm}\) State policy reform is a complex process that cannot be captured by the actions of an individual state governor alone. There has been much scholarship in the field of policy diffusion and investigation of the factors and underlying network that cause states to adopt certain policies. In their study of the correlation between perceived state similarity and similar policy adoption, @Bricker find that factors like perceived state similarity, legislative professionalism, population size differences, and different partisan control of state legislatures can significantly impact whether a state will adopt a policy similar to a policy  previously adopted by another state. @Desmarais model a latent underlying state policy diffusion network that correlates with media state policy emulation stories, finding that California tops the list, especially in more recent years (2005-2009), as a leading policy innovator. In Gavin Newsom’s tweet regarding California’s passage of new standards for police use of force in 2019, he says the passage “[makes California] a model for the rest of the nation”, highlighting that he likely expects the rest of the states to observe the efficacy of this legislation and adopt it if successful. This showcases an important factor in state policy adoption, learning (proposed by @Shipan), in which states may observe policy efficacy in other states before deciding to implement it themselves. Given the results of Desmarais et al. and Governor Newsom’s statement, it is possible that we will find California to be a big policy adopter in our network, adopting more police reform policies than other states. Overall, we know that there is non-independence among states regarding choice of policy adoption, which is something we control for in our analysis by treating state policy adoption as a network object.
 
 \(\text{Hypothesis}_2: \text{California will be a policy innovator in our network, adopting police reform} \\ \text{legislation early on in the diffusion process.}\)
+
+In addition to the independent variable of governor Twitter behavior, we use state control variables as identified by Bricker and LaCombe, 2020. Their pooled dyadic event history analysis predicting similar policy adoption features 9 state level attributes, of which we selected contiguity, percent white, median income, population, percent urban, and census region. (variables may change) Contiguity is defined as a binary value of shared state borders. (more codebook definitions) We additionally include a measure of percent Black to account for Black Lives Matter movement interests. The state level attributes are sourced from the Correlates of State Policy dataset, which contains over 3000 variables representing political, social, and economic impacts on policy. The dataset covers all 50 states and spans the time period approximately 1900-2020.
 
 ## The Relationship Between Twitter and Police-Reform Policy Adoption
 
@@ -81,8 +82,8 @@ We employed a topic classification algorithm using gradient-boosted trees and 5-
 
 @(Bill Lee): “Approaches that would result in the total upheaval of police are not the right approach to these real and challenging issues. We support law enforcement in Tennessee, and I have the utmost respect for these men and women who serve their communities every day.”
 
-Some politicians expressed sentiments from both groups at the same time. 
-@NC_Governor (Roy Cooper): “It’s critical that our state law enforcement be leaders in repairing this breach. They have a tough job and I’m grateful for so many of them who are doing their best to protect and serve with fairness. Many are now acknowledging that systemic and cultural changes must be made.”
+Some politicians expressed sentiments from both groups at the same time. \
+\(\hspace{.5cm}\) \@NC_Governor (Roy Cooper): “It’s critical that our state law enforcement be leaders in repairing this breach. They have a tough job and I’m grateful for so many of them who are doing their best to protect and serve with fairness. Many are now acknowledging that systemic and cultural changes must be made.”
 
 Due to the sometimes ambiguous nature and expression of political ideologies, these categories do not fully encompass all that is put forth in a politician’s social media content. A tweet advocating for policing transparency may also encourage additional support for the law enforcement branch making those changes in the same breath. Would such a tweet be aligned with the movement calls for reform, or against the demands for defunding? Such contradictions fall within the mixed goals of a grassroots-organized movement. We ran a binary classification algorithm on each of the three topic groups to annotate tweets with none, one, or multiple labels. 
 
@@ -90,11 +91,51 @@ The state legislative data is sourced from the Brennan Center for Justice, a non
 
 The 50 states are represented as an undirected network, with the degree of similarity between the states computed as the number of shared policies of 15 potential policing reform policies. Similar to policy diffusion networks, weighted ties connect states with shared state policies. We investigate the relationship between our dependent variable of inter-state legislative similarity with independent variable attributes of the social media agenda setting of state governors. We find the frequency of on topic tweeting, relative ratio to total tweets, and amount of positive or negative opinion. While increased frequency is hypothesized to correlate with adoption of legislation, certain legislators produce a much greater volume of tweets than others. The topical makeup of their social media statements may signify legislative priorities, and whether or not that politician is highly motivated to take action on issues of criminal justice. 
 
+To measure similarity of BLM tweeting frequency between governors, we measured the absolute difference in estimated proportion of tweets relating to BLM. To measure pro-BLM tweeting similarity, we repeated this process for proportion of tweets that were estimated to be pro-BLM. State 
+
+We ran a network regression with 1000 repetitions, regressing the shared police reform bills network on. The Quadratic Assignment Procedure (QAP) permutation test, using Dekker's "semi-partialling plus" procedure was used, as it is recommended for multivariate analyses.
+
 # Results
 
+### States that adopted the most police reform legislation
 
+```{r, echo = FALSE, message = FALSE}
+library(here)
+library(tidyverse)
+i_am("final-paper/final-paper.Rmd")
+# number of policy adoptions by state
+readRDS(here("data/bills_list.Rds")) |>
+  filter(total > 0) |>
+  head(5) |>
+  knitr::kable()
+```
+\(\hspace*{\fill} \footnotesize \text{Figure 1. Top police reform policy-adopting states}\)
+
+The top five states that adopted the most police reform laws from May 25, 2020-May 21, 2021 were Illinois, Washington, Colorado, Massachusetts, and Virginia.
+
+```{r, echo = FALSE, fig.cap = ""}
+gov_mod <- readRDS(here("data/governor_mod.Rds"))
+tibble(Variable = c("Intercept", "Male", "Republican"), "Estimated Coefficient" = round(gov_mod$coefficients, 3), "Standard Error" = round(summary(gov_mod)$coefficients[,2], 3), "t-value" = round(summary(gov_mod)$coefficients[,3], 3), "Pr(>|t|)" = round(summary(gov_mod)$coefficients[,4], 3)) |>
+  knitr::kable()
+```
+\(\hspace*{\fill} \footnotesize \text{Figure 2. Regression of BLM tweeting proportion on governor gender and party}\)
+
+```{r, echo = FALSE}
+regression <- readRDS(here("data/state_model.Rds"))
+tibble(Variable = c("Intercept", "Contiguity", "Ideology", "White", "Black", "BLM", "Pro-BLM"), "Estimated Coefficient" = regression$coefficients, "Pr(<=b)" = regression$pleeq, "Pr(>=b)" = regression$pgreq, "Pr(>=|b|" = regression$pgreqabs) |>
+  knitr::kable()
+```
+
+\(\hspace*{\fill} \footnotesize \text{Figure 3. Network regression of shared police reform policy on state contiguity, difference in state}\) 
+\(\hspace*{\fill} \footnotesize \text{ideology, percent Black, percent white, difference in proportion of BLM tweets and difference in}\)
+\(\hspace*{\fill} \footnotesize \text{proportion of pro-BLM tweets.}\)
+
+Note: Unfortunately, the anti-BLM classification model was not accurate enough to include it in our analysis.
 
 # Discussion
 
-Unfortunately, the anti-BLM classification model was not accurate enough to include it in our analysis
+None of our estimated coefficient values were significantly different from their predicted null hypothesis values in our police reform legislation-adoption regression, and none of our predictors were significant in the model predicting BLM tweeting frequency. This is contray to our original hypotheses, and points to a need for further analysis.
 
+# Limitations and Future Work
+
+It would be interesting to run a time-series dyadic analysis, to understand who the policy innovators are in our network. For example, Governor Newsom tweeted that he thought California would be a model for the rest of the nation by passing their police reform policy, so it would be worthwhile to attempt to investigate and validate these claims (though it is unlikely California is a major policy innovator for May 25, 2020-May 21, 2021 police reform legislation considering they passed one law.)

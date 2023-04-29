@@ -10,27 +10,121 @@ editor: visual
 library(tidyverse)
 library(igraph)
 library(here)
+library(janitor)
+#detach(package:statnet,unload=TRUE)
 
 bill_edge_list <- read_csv(here("data/edge-list.csv"))
 tweets_df <- read_csv(here("data/full-labelled-tweets.csv"))
-states_df <- read_csv(here("raw-data/state-traits-edgelist.csv"))
+states_edge_list <- read_csv(here("raw-data/state-traits-edgelist.csv"))
 ```
 
+Wrangle data
 ```{r}
 #summarize tweets by governor
 governor_tweets_df <- tweets_df %>% 
   select(name, state, 
-         pro_blm_count, topic_blm_count, total_count, 
          pro_blm_ratio, topic_blm_ratio) %>% 
-  distinct()
+  distinct() 
 
-#merge gov tweets with states edge list 
+#5 states out of 50 not represented in twitter data and bill data
+missing_states <- c("AR", "MS", "NV", "NY", "WV", "DC")
+
+#select variables from state df
+states_edge_list <- states_edge_list %>% 
+  select(state_01, state_02, contig, dif_mrp_ideology, dif_urban_index, 
+         dif_White, dif_Black)
+
+#select variables from state bills 
+bill_edge_list <- bill_edge_list %>% 
+  select(state, "state-j", score) %>% 
+  filter(!(state %in% missing_states)) %>% 
+  filter(!('state-j' %in% missing_states))
+  
+```
+
+Merge into full edge list
+```{r}
+#merge gov tweets with state i 
 merged_edge_list <- bill_edge_list %>% 
-  left_join(governor_tweets_df, by = "state") 
+  left_join(governor_tweets_df, by = "state")
 
+#merge tweets with state j
+merged_edge_list <- merged_edge_list %>% 
+  left_join(governor_tweets_df, by = c("state-j" = "state"))
+  
 #merge with state traits
 full_edge_list <- merged_edge_list %>% 
-  left_join(states_df, by = c("state" = "state_01", "state-j" = "state_02"))
+  left_join(states_edge_list, by = c("state" = "state_01", "state-j" = "state_02")) %>% 
+  clean_names() %>% 
+  filter(!is.na(name_y)) %>% 
+  filter(!is.na(name_x)) %>% 
+  mutate(dif_ratio = abs(topic_blm_ratio_x - topic_blm_ratio_y)) |>
+  filter(!(state %in% missing_states)) %>% 
+  filter(!(state_j %in% missing_states))
 
-#everything is joined! should filter out unnecessary variables next
+#
+
+states <- full_edge_list %>% 
+  select(state) %>% 
+  distinct() 
+
 ```
+
+Create igraph network
+```{r}
+library(igraph)
+igraph <- graph.data.frame(full_edge_list, directed = FALSE, vertices = states)
+
+plot(igraph, vertex.label = V(igraph)$state)
+
+#DV
+similarity <- as_adjacency_matrix(igraph, attr="score")
+similarity <- as.matrix(similarity)
+
+#IVs
+twitter <- as_adjacency_matrix(igraph, attr="dif_ratio")
+twitter <- as.matrix(twitter)
+contiguity <- as_adjacency_matrix(igraph, attr="contig")
+contiguity <- as.matrix(contiguity)
+ideology <- as_adjacency_matrix(igraph, attr="dif_mrp_ideology")
+ideology <- as.matrix(ideology)
+white <- as_adjacency_matrix(igraph, attr="dif_white")
+white <- as.matrix(white)
+black <- as_adjacency_matrix(igraph, attr="dif_black")
+black <- as.matrix(black)
+gov_gender <- import(here("data/gov_gender_mat.Rds"))
+gov_age <- import(here("data/gov_age_mat.Rds"))
+gov_party <- import(here("data/gov_party_mat.Rds"))
+
+state_matrices <- array(NA, c(8, length(contiguity[1,]),length(contiguity[1,]))) 
+
+state_matrices[1,,] <- contiguity
+state_matrices[2,,] <- ideology
+state_matrices[3,,] <- white
+state_matrices[4,,] <- black
+state_matrices[5,,] <- twitter
+state_matrices[6,,] <- gov_gender
+state_matrices[7,,] <- gov_age
+state_matrices[8,,] <- gov_party
+```
+
+Run regression
+
+```{r}
+#library(statnet)
+#detach(package:igraph,unload=TRUE)
+
+state_sim_lm <- sna::netlm(similarity, state_matrices, reps=100)
+
+state_model <- list()
+state_model <- summary(state_sim_lm)
+state_model$names <- c("Intercept", "Contiguity", "Ideology", "White", "Black", "Twitter", "Governor Gender", "Governor Age", "Governor Party")
+
+state_model$coefficients = round(state_model$coefficients, 2)
+state_model
+
+nl <- sna::netlm(similarity,           # Dependent variable/network
+          list(contiguity, ideology, white, black), # List the independent variables/networks
+          reps=1000) 
+```
+

@@ -27,6 +27,17 @@
 \providecommand{\tightlist}{%
   \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
 
+% From pandoc table feature
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
 
 
 
@@ -74,7 +85,9 @@ also provided a convenient and public way for the public and
 organizations to call on elected officials to take action on relevant
 issues facing the public. We investigate whether state governors twitter
 habits regarding the Black Lives Matter movement correlates with passage
-of police reform laws in the state policy diffusion network.
+of police reform laws in the state policy diffusion network. NOTE TO
+READERS: This is still a very rough draft, we are planning to flesh out
+our discussion and results futher.
 \end{abstract}
 
 \noindent%
@@ -102,8 +115,9 @@ unprecedented societal pressure to crack down on police violence and
 enact substantial police reform laws. Though a controversial issue that
 saw many bills die in committee in Congress, the states had more power
 to pass police reform legislation if pursued. This provides the
-motivation of our work investigating whether tweeting about the Black
-Lives Matter movement correlates with police reform policy adoption.
+motivation of our work investigating whether tweeting similarly about
+the Black Lives Matter movement correlates with similar police reform
+policy adoption.
 
 \hypertarget{literature-review}{%
 \section{Literature Review}\label{literature-review}}
@@ -166,10 +180,10 @@ general and express their concern for police brutality, while
 Republicans are less likely to tweet about the movement overall and more
 likely to express concern about perceived protest violence associated
 with the movement. Because of these findings, we hypothesize that
-Democratic governors will be more likely to tweet about BLM and police
-reform overall.
+Democrat (and possible female) governors will be more likely to tweet
+about BLM and police reform overall.
 
-\(\text{Hypothesis}_1: \text{Democratic governors will be more likely to tweet about BLM and police} \\ \text{reform overall.}\)
+\(\text{Hypothesis}_1: \text{Democrat (and female) governors will be more likely to tweet about BLM and police} \\ \text{reform overall.}\)
 
 \hypertarget{black-lives-matter-movement-and-twitter}{%
 \subsection{Black Lives Matter movement and
@@ -200,9 +214,9 @@ officials that is more convenient and public than traditional methods of
 citizen-politician communication such as letter-writing or emailing.
 
 \(\hspace{.5cm}\) Citizens rely on elected officials to implement policy
-and make change when the public is faced with injustices. When
-politicians tweet support for certain policies or ideas, this is
-important, but besides declarations of signing bills into law or
+and make change when the public is faced with injustices. It is
+important for politicians to tweet support for certain policies or
+ideas, but besides declarations of signing bills into law or
 cosponsoring legislation, how does the public know if this support holds
 up when it comes time to vote? For example, \citet{Inslee}, governor of
 the state of Washington, tweeted during the height of the BLM movement's
@@ -238,16 +252,31 @@ police use of force in 2019, he says the passage ``{[}makes
 California{]} a model for the rest of the nation'', highlighting that he
 likely expects the rest of the states to observe the efficacy of this
 legislation and adopt it if successful. This showcases an important
-factor in policy diffusion, learning (proposed by \citet{Shipan}), in
-which states may observe policy efficacy in other states before deciding
-to implement it themselves. Given the results of Desmarais et al.~and
-Governor Newsom's statement, it is possible that we will find California
-to be a policy innovator in our network. Overall, we know that there is
+factor in state policy adoption, learning (proposed by \citet{Shipan}),
+in which states may observe policy efficacy in other states before
+deciding to implement it themselves. Given the results of Desmarais et
+al.~and Governor Newsom's statement, it is possible that we will find
+California to be a big policy adopter in our network, adopting more
+police reform policies than other states. Overall, we know that there is
 non-independence among states regarding choice of policy adoption, which
 is something we control for in our analysis by treating state policy
 adoption as a network object.
 
 \(\text{Hypothesis}_2: \text{California will be a policy innovator in our network, adopting police reform} \\ \text{legislation early on in the diffusion process.}\)
+
+In addition to the independent variable of governor Twitter behavior, we
+use state control variables as identified by Bricker and LaCombe, 2020.
+Their pooled dyadic event history analysis predicting similar policy
+adoption features 9 state level attributes, of which we selected
+contiguity, percent white, median income, population, percent urban, and
+census region. (variables may change) Contiguity is defined as a binary
+value of shared state borders. (more codebook definitions) We
+additionally include a measure of percent Black to account for Black
+Lives Matter movement interests. The state level attributes are sourced
+from the Correlates of State Policy dataset, which contains over 3000
+variables representing political, social, and economic impacts on
+policy. The dataset covers all 50 states and spans the time period
+approximately 1900-2020.
 
 \hypertarget{the-relationship-between-twitter-and-police-reform-policy-adoption}{%
 \subsection{The Relationship Between Twitter and Police-Reform Policy
@@ -260,27 +289,46 @@ and ideas, and that Twitter has immense power in helping social
 movements expand their reach and influence, and communicate with
 political elites. However, no studies have been found that investigate
 whether promises made, stances declared, or movements talked about by
-politicians via Twitter correlate with how they implement policies. We
-investigate whether tweeting about the Black Lives Matter movement
-during its peak correlates with police reform policy adoption in U.S.
-states. We hypothesize that a state governor tweeting about BLM will
-positively correlate with that state adopting some level of police
-reform policy.
+politicians via Twitter correlate with how they implement policies.
+Because policy adoption has an underlying non-independent network
+structure, our we can transform our governor Tweeting habits into a
+network object to understand if these networks are correlated. We
+investigate if similar governor tweeting habits regarding the Black
+Lives Matter movement during its peak correlate with police reform
+policy adoption in their respective states. We hypothesize that state
+governors tweeting similarly about BLM will positively correlate with
+their states adopting similar police reform policies. But tweeting
+similarly can mean different things. We specifically hypothesize that
+states with governors who tweet about BLM more in general will be more
+likely to adopt similar police reform policies, given the results that
+tweeting more frequently about BLM often goes hand-in-hand with being
+more pro-BLM. We also hypothesize that states with governors who tweet
+positively about the BLM movement more often will likely adopt similar
+police reform policies, as these state governors are likely more
+sympathetic towards the movement and more willing to make change.
+Lastly, we hypothesize that states with governors who tweet negatively
+about the BLM movement more often will likely adopt few police reform
+policies, as these state governors are likely less sympathetic towards
+the movement and less willing to make change.
 
-\(\text{Hypothesis}_3: \text{A state governor tweeting about BLM will positively correlate with that} \\ \text{state adopting some level of police reform policy.}\)
+\(\text{Hypothesis}_3: \text{States with governors who tweet about BLM more in general will be more likely to adopt more similar police reform policies.}\)
+
+\(\text{Hypothesis}_4: \text{States with governors who both tweet positively about the BLM movement more often will likely adopt more similar police reform policies.}\)
+
+\(\text{Hypothesis}_5: \text{Wtates with governors who tweet negatively about the BLM movement more often will likely adopt fewer police reform policies.}\)
 
 \hypertarget{methods}{%
 \section{Methods}\label{methods}}
 
-\(\hspace{.5cm}\) The first dataset contains full Twitter data of US
-state governors over the period of May 1, 2020 to October 31, 2020. It
-was acquired from the open dataset by Zhaozhi Li and Chenglin Zhang from
-an article titled ``Senators' Response to Black Lives Matter during the
-2020 Election Campaign: Evidence from Twitter''. The original web
-scraping was conducted using the Selenium Python package. The dataset
-includes 30,490 tweets with the associated governor name, party, Twitter
-account, time, and text. The text contains the main body of the tweet as
-well as any hashtags (e.g.~\#BackTheBlue, \#BlackLivesMatter,
+\(\hspace{.5cm}\) Our governor Twitter dataset contains full Twitter
+data of US state governors over the period of May 1, 2020 to October 31,
+2020. It was acquired from the open dataset by Zhaozhi Li and Chenglin
+Zhang from an article titled ``Senators' Response to Black Lives Matter
+during the 2020 Election Campaign: Evidence from Twitter''. The original
+web scraping was conducted using the Selenium Python package. The
+dataset includes 30,490 tweets with the associated governor name, party,
+Twitter account, time, and text. The text contains the main body of the
+tweet as well as any hashtags (e.g.~\#BackTheBlue, \#BlackLivesMatter,
 \#COVID19).
 
 The time period of the tweet data overlaps with the murder of George
@@ -296,8 +344,8 @@ prevention.
 Joint methods of key term identification and binary classification were
 used to label the full set of tweets with the binary designation of
 content relating to George Floyd, the Black Lives Matter movement, or
-policing. {[}more theory here?{]} From here, we will use ``on topic'' to
-refer to text that represents any of these connected topics.
+policing. From here, we will use ``on topic'' to refer to text that
+represents any of these connected topics.
 
 on\_topic \textless- c(`Floyd', `Breonna', `Breonna Taylor', `BLM',
 `blm', `Black Lives Matter', `lack lives matter', `protest', `justice',
@@ -316,8 +364,10 @@ anti-racist and pro-equality statements. Anti- tweets decried the need
 for mass protest and civil unrest; contained expressions of support for
 law enforcement; or denigrated the legitimacy of the movement.
 
-We employed a topic classification algorithm using {[}{]} and N-fold
-cross validation. Topic classification, otherwise known as text
+We employed a topic classification algorithm using gradient-boosted
+trees and 5-fold cross validation. Gradient-boosted trees are a boosted
+sum of trees model that are able to integrate gradient descent to
+improve accuracy. Topic classification, otherwise known as text
 classification, is a supervised text mining method and a sub-field of
 natural language processing (NLP) machine learning. As a supervised The
 model was trained on a sample of approximately 3,500 hand-labeled
@@ -335,12 +385,13 @@ police are not the right approach to these real and challenging issues.
 We support law enforcement in Tennessee, and I have the utmost respect
 for these men and women who serve their communities every day.''
 
-Some politicians expressed sentiments from both groups at the same time.
-\citet{NC_Governor} (Roy Cooper): ``It's critical that our state law
-enforcement be leaders in repairing this breach. They have a tough job
-and I'm grateful for so many of them who are doing their best to protect
-and serve with fairness. Many are now acknowledging that systemic and
-cultural changes must be made.''
+Some politicians expressed sentiments from both groups at the same
+time.\\
+\(\hspace{.5cm}\) @NC\_Governor (Roy Cooper): ``It's critical that our
+state law enforcement be leaders in repairing this breach. They have a
+tough job and I'm grateful for so many of them who are doing their best
+to protect and serve with fairness. Many are now acknowledging that
+systemic and cultural changes must be made.''
 
 Due to the sometimes ambiguous nature and expression of political
 ideologies, these categories do not fully encompass all that is put
@@ -360,30 +411,155 @@ policing reform: use of force; duty for officers to intervene, report,
 or render medical aid in instances of police misconduct; and policies
 relating to law enforcement misconduct reporting and decertification.
 All 50 states have adopted some form of legislation relating to at least
-of the identified policy areas within the time period of May 25, 2020 to
-May 21, 2021. The use of force category of bills restricts or specifies
-the type of physical force police officers are allowed to employ in
-certain situations. Duty to intervene policies establish responsibility
-for officers to intervene in cases where they witness use of excessive
-force, and penalties for failure to do so. Finally, decertification \&
-centralized misconduct reporting bills establish or centralize state
-misconduct reports that may result in an officer being decertified and
-removed from duty.
+one of the identified policy areas within the time period of May 25,
+2020 to May 21, 2021. The use of force category of bills restricts or
+specifies the type of physical force police officers are allowed to
+employ in certain situations. Duty to intervene policies establish
+responsibility for officers to intervene in cases where they witness use
+of excessive force, and penalties for failure to do so. Finally,
+decertification \& centralized misconduct reporting bills establish or
+centralize state misconduct reports that may result in an officer being
+decertified and removed from duty.
 
 The 50 states are represented as an undirected network, with the degree
-of similarity between the states among a group of 15 potential policies
-of policing reform. Similar to policy diffusion networks, weighted ties
-connect states with shared state policies. We investigate the
-relationship between our dependent variable of inter-state legislative
-similarity with independent variable attributes of the social media
-agenda setting of state governors. We find the frequency of on topic
-tweeting, relative ratio to total tweets, and amount of positive or
-negative opinion. While increased frequency is hypothesized to correlate
-with adoption of legislation, certain legislators produce a much greater
-volume of tweets than others. The topical makeup of their social media
-statements may signify legislative priorities, and whether or not that
-politician is highly motivated to take action on issues of criminal
-justice.
+of similarity between the states computed as the number of shared
+policies of 15 potential policing reform policies. Similar to policy
+diffusion networks, weighted ties connect states with shared state
+policies. We investigate the relationship between our dependent variable
+of inter-state legislative similarity with independent variable
+attributes of the social media agenda setting of state governors. We
+find the frequency of on topic tweeting, relative ratio to total tweets,
+and amount of positive or negative opinion. While increased frequency is
+hypothesized to correlate with adoption of legislation, certain
+legislators produce a much greater volume of tweets than others. The
+topical makeup of their social media statements may signify legislative
+priorities, and whether or not that politician is highly motivated to
+take action on issues of criminal justice.
+
+To measure similarity of BLM tweeting frequency between governors, we
+measured the absolute difference in estimated proportion of tweets
+relating to BLM. To measure pro-BLM tweeting similarity, we repeated
+this process for proportion of tweets that were estimated to be pro-BLM.
+State
+
+We ran a network regression with 1000 repetitions, regressing the shared
+police reform bills network on. The Quadratic Assignment Procedure (QAP)
+permutation test, using Dekker's ``semi-partialling plus'' procedure was
+used, as it is recommended for multivariate analyses.
+
+\hypertarget{results}{%
+\section{Results}\label{results}}
+
+\hypertarget{states-that-adopted-the-most-police-reform-legislation}{%
+\subsubsection{States that adopted the most police reform
+legislation}\label{states-that-adopted-the-most-police-reform-legislation}}
+
+\begin{longtable}[]{@{}lr@{}}
+\toprule()
+state & total \\
+\midrule()
+\endhead
+IL & 14 \\
+WA & 14 \\
+CO & 13 \\
+MA & 12 \\
+VA & 12 \\
+\bottomrule()
+\end{longtable}
+
+\(\hspace*{\fill} \footnotesize \text{Figure 1. Top police reform policy-adopting states}\)
+
+The top five states that adopted the most police reform laws from May
+25, 2020-May 21, 2021 were Illinois, Washington, Colorado,
+Massachusetts, and Virginia.
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1467}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2933}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1067}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2533}}@{}}
+\toprule()
+\begin{minipage}[b]{\linewidth}\raggedright
+Variable
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Estimated Coefficient
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Standard Error
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+t-value
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Pr(\textgreater\textbar t\textbar)
+\end{minipage} \\
+\midrule()
+\endhead
+Intercept & 0.073 & 0.017 & 4.369 & 0.000 \\
+Male & -0.021 & 0.019 & -1.121 & 0.269 \\
+Republican & -0.015 & 0.015 & -0.951 & 0.347 \\
+\bottomrule()
+\end{longtable}
+
+\(\hspace*{\fill} \footnotesize \text{Figure 2. Regression of BLM tweeting proportion on governor gender and party}\)
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1618}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.3235}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1176}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1176}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2794}}@{}}
+\toprule()
+\begin{minipage}[b]{\linewidth}\raggedright
+Variable
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Estimated Coefficient
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Pr(\textless=b)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Pr(\textgreater=b)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Pr(\textgreater=\textbar b\textbar{}
+\end{minipage} \\
+\midrule()
+\endhead
+Intercept & 1.47 & 0.999 & 0.001 & 0.001 \\
+Contiguity & -0.06 & 0.336 & 0.664 & 0.676 \\
+Ideology & -1.01 & 0.044 & 0.956 & 0.103 \\
+White & -0.02 & 0.584 & 0.416 & 0.988 \\
+Black & -1.05 & 0.197 & 0.803 & 0.409 \\
+BLM & -0.87 & 0.474 & 0.526 & 0.755 \\
+Pro-BLM & 1.05 & 0.546 & 0.454 & 0.937 \\
+\bottomrule()
+\end{longtable}
+
+\(\hspace*{\fill} \footnotesize \text{Figure 3. Network regression of shared police reform policy on state contiguity, difference in state}\)
+\(\hspace*{\fill} \footnotesize \text{ideology, percent Black, percent white, difference in proportion of BLM tweets and difference in}\)
+\(\hspace*{\fill} \footnotesize \text{proportion of pro-BLM tweets.}\)
+
+Note: Unfortunately, the anti-BLM classification model was not accurate
+enough to include it in our analysis.
+
+\hypertarget{discussion}{%
+\section{Discussion}\label{discussion}}
+
+None of our estimated coefficient values were significantly different
+from their predicted null hypothesis values in our police reform
+legislation-adoption regression, and none of our predictors were
+significant in the model predicting BLM tweeting frequency. This is
+contray to our original hypotheses, and points to a need for further
+analysis.
+
+\hypertarget{limitations-and-future-work}{%
+\section{Limitations and Future
+Work}\label{limitations-and-future-work}}
+
+It would be interesting to run a time-series dyadic analysis, to
+understand who the policy innovators are in our network. For example,
+Governor Newsom tweeted that he thought California would be a model for
+the rest of the nation by passing their police reform policy, so it
+would be worthwhile to attempt to investigate and validate these claims
+(though it is unlikely California is a major policy innovator for May
+25, 2020-May 21, 2021 police reform legislation considering they passed
+one law.)
 
 \bibliographystyle{agsm}
 \bibliography{bibliography.bib}
