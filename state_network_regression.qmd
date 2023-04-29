@@ -9,6 +9,8 @@ editor: visual
 ```{r}
 library(tidyverse)
 library(igraph)
+library(janitor)
+detach(package:statnet,unload=TRUE)
 
 bill_edge_list <- read_csv("data/edge-list.csv")
 tweets_df <- read_csv("data/full-labelled-tweets.csv")
@@ -21,14 +23,15 @@ Wrangle data
 governor_tweets_df <- tweets_df %>% 
   select(name, state, 
          pro_blm_ratio, topic_blm_ratio) %>% 
-  distinct()
+  distinct() 
 
 #5 states out of 50 not represented in twitter data
 missing_states <- c("AR", "MS", "NV", "NY", "WV")
 
 #select variables from state df
 states_edge_list <- states_edge_list %>% 
-  select(state_01, state_02, contig, mrp_ideology_01, mrp_ideology_02)
+  select(state_01, state_02, contig, dif_mrp_ideology, dif_urban_index, 
+         dif_White, dif_Black)
 
 #select variables from state bills 
 bill_edge_list <- bill_edge_list %>% 
@@ -50,7 +53,14 @@ merged_edge_list <- merged_edge_list %>%
   
 #merge with state traits
 full_edge_list <- merged_edge_list %>% 
-  left_join(states_edge_list, by = c("state" = "state_01", "state-j" = "state_02"))
+  left_join(states_edge_list, by = c("state" = "state_01", "state-j" = "state_02")) %>% 
+  clean_names() %>% 
+  filter(!is.na(name_y)) %>% 
+  filter(!is.na(name_x)) %>% 
+  mutate(dif_ratio = (topic_blm_ratio_x - topic_blm_ratio_y)*100) %>% 
+  mutate(dif_ratio = ifelse(dif_ratio < 0.1, 0.1, dif_ratio))
+
+#
 
 states <- full_edge_list %>% 
   select(state) %>% 
@@ -66,15 +76,45 @@ plot(igraph, vertex.label = V(igraph)$state)
 
 #DV
 similarity <- as_adjacency_matrix(igraph, attr="score")
+similarity <- as.matrix(similarity)
 
 #IVs
+twitter <- as_adjacency_matrix(igraph, attr="dif_ratio")
+twitter <- as.matrix(twitter)
+contiguity <- as_adjacency_matrix(igraph, attr="contig")
+contiguity <- as.matrix(contiguity)
+ideology <- as_adjacency_matrix(igraph, attr="dif_mrp_ideology")
+ideology <- as.matrix(ideology)
+white <- as_adjacency_matrix(igraph, attr="dif_white")
+white <- as.matrix(white)
+black <- as_adjacency_matrix(igraph, attr="dif_black")
+black <- as.matrix(black)
 
+state_matrices <- array(NA, c(5, length(contiguity[1,]),length(contiguity[1,]))) 
+
+state_matrices[1,,] <- contiguity
+state_matrices[2,,] <- ideology
+state_matrices[3,,] <- white
+state_matrices[4,,] <- black
+state_matrices[5,,] <- twitter
 ```
 
 Run regression
 ```{r}
-nl<-netlm(Padgett_Business,           # Dependent variable/network
-          list(Padgett_Marriage, Padgett_Party), # List the independent variables/networks
+library(statnet)
+detach(package:igraph,unload=TRUE)
+
+state_sim_lm<-netlm(similarity, state_matrices, reps=100)
+
+state_model <- list()
+state_model <- summary(state_sim_lm)
+state_model$names <- c("Intercept", "Contiguity", "Ideology", "White", "Black", "Twitter")
+
+state_model$coefficients = round(state_model$coefficients, 2)
+state_model
+
+nl<-netlm(similarity,           # Dependent variable/network
+          list(contiguity, ideology, white, black), # List the independent variables/networks
           reps=1000) 
 ```
 
