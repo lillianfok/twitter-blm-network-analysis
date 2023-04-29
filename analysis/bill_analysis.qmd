@@ -14,13 +14,15 @@ library(textTools)
 library(rio)
 library(statnet)
 library(network)
+library(here)
 
-reporting <- read_xlsx("data/state-decert-reporting-bills.xlsx")
-duty_to <- read_xlsx("data/state-duty-to-bills.xlsx")
-use_of_force <- read_xlsx("data/state-use-of-force-bills.xlsx")
+reporting <- read_xlsx(here("data/state-decert-reporting-bills.xlsx"))
+duty_to <- read_xlsx(here("data/state-duty-to-bills.xlsx"))
+use_of_force <- read_xlsx(here("data/state-use-of-force-bills.xlsx"))
 ```
 
 ## Clean and merge data
+
 ```{r}
 #convert to binary indicator
 use_of_force <- use_of_force %>% 
@@ -49,35 +51,37 @@ bills <- state_ids %>%
   full_join(bills, by = "state")
 ```
 
-
 ## Make copies of variables
+
 ```{r}
 bills <- bills %>% 
   rename(`req-report-state` = `require-reporting-state`) %>%
   rename(`req-report-fed` = `require-reporting-federal`) %>% 
-  rename(`req-database` = `require-database`)
+  rename(`req-database` = `require-database`) #%>%
+  #janitor::clean_names()
   
 bills <- bills %>% 
-  mutate(`state-j` = state) %>% 
-  mutate(`create-centralized-j` = `create-centralized`) %>% 
-  mutate(`decertification-j` = decertification) %>% 
-  mutate(`req-report-state-j` = `req-report-state`) %>%
-  mutate(`req-report-fed-j` = `req-report-fed`) %>% 
-  mutate(`req-database-j` = `req-database`) %>% 
-  mutate(`duty-intervene-j` = `duty-intervene`) %>% 
-  mutate(`duty-report-j` = `duty-report`) %>% 
-  mutate(`duty-aid-j` = `duty-aid`) %>% 
-  mutate(`sanctions-j` = sanctions) %>% 
-  mutate(`ban-chokeholds-j` = `ban-chokeholds`) %>% 
-  mutate(`restrict-chokeholds-j` = `restrict-chokeholds`) %>% 
-  mutate(`restrict-force-fleeing-j` = `restrict-force-fleeing`) %>% 
-  mutate(`fatal-force-policy-j` = `fatal-force-policy`) %>% 
-  mutate(`req-report-state-force-j` = `req-report-state-force`) %>% 
-  mutate(`req-report-fed-force-j` = `req-report-fed-force`)
+  mutate(`state-j` = state,
+         `create-centralized-j` = `create-centralized`,
+         `decertification-j` = decertification,
+         `req-report-state-j` = `req-report-state`,
+         `req-report-fed-j` = `req-report-fed`,
+         `req-database-j` = `req-database`,
+         `duty-intervene-j` = `duty-intervene`,
+         `duty-report-j` = `duty-report`,
+         `duty-aid-j` = `duty-aid`,
+         `sanctions-j` = sanctions, 
+         `ban-chokeholds-j` = `ban-chokeholds`,
+         `restrict-chokeholds-j` = `restrict-chokeholds`,
+         `restrict-force-fleeing-j` = `restrict-force-fleeing`, 
+         `fatal-force-policy-j` = `fatal-force-policy`,
+         `req-report-state-force-j` = `req-report-state-force`,
+         `req-report-fed-force-j` = `req-report-fed-force`)
 
 ```
 
 ## Create all possible combinations of states
+
 ```{r}
 combos <- bills %>% 
   expand(state, `state-j`) %>% 
@@ -86,6 +90,7 @@ combos <- bills %>%
 ```
 
 ## Create and combine i and j nodes
+
 ```{r}
  DF1 <- bills %>% 
    select(state,
@@ -123,12 +128,13 @@ combos <- bills %>%
 
  ### Merge data
  joined_data <- left_join(combos, DF1, by = "state")
-  joined_data <- left_join(joined_data, DF2, by = "state-j")
+ joined_data <- left_join(joined_data, DF2, by = "state-j")
   
 edge_list <- joined_data
 ```
 
 ## Calculate shared policy adoption
+
 ```{r}
 #convert all numeric columns to int 
 edge_list <- type.convert(edge_list, as.is = TRUE)
@@ -184,11 +190,18 @@ edge_list <- edge_list %>%
            `fatal-force-policy-shared` +
            `req-report-state-force-shared` +
            `req-report-fed-force-shared`) %>% 
-  subset(select = -c(sanctions, `sanctions-j`))
+  subset(select = -c(sanctions, `sanctions-j`)) #%>%
+  #filter(score > 1)
+
+bill_score <- edge_list |>
+  janitor::clean_names() |>
+  select(state, state_j, score)
+
+#saveRDS(bill_score, here("data/bill_edgelist.Rds"))
 ```
 
-
 ## Create network
+
 ```{r}
 nv <- nrow(bills)
 net_bills <-network.initialize(nv) #empty network
@@ -205,8 +218,7 @@ plot(net_bills, label=network.vertex.names(net_bills))
 
 ```
 
-
-##### PLOTTING STATNET NETWORK HERE #####
+##### PLOTTING STATNET NETWORK HERE
 
 ```{r}
 set.vertex.attribute(x=net_bills,attrname="state_id",val=bills$state)
@@ -227,6 +239,7 @@ gplot(net_bills,
 ```
 
 ## Convert to igraph
+
 ```{r}
 library(intergraph)
 detach(package:statnet)
@@ -236,4 +249,3 @@ igraph <- asIgraph(net_bills)
 
 plot(igraph, layout = layout_in_circle)
 ```
-

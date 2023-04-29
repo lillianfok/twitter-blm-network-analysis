@@ -1,0 +1,148 @@
+# PURPOSE: Prepare senator control variables as matrices for network regression
+
+
+# Load packages -----------------------------------------------------------
+
+library(tidyverse)
+library(here)
+library(rio)
+# quick list of states
+library(datasets)
+
+# Load data ---------------------------------------------------------------
+
+i_am("analysis/control-variable-processing.R")
+
+governor_data <- import(here("data/senator_twitter_May-Oct.csv"))
+
+# get states present in dataset
+states <- governor_data |>
+  select(name, state) |>
+  filter(!duplicated(name)) |>
+  pull(state) |>
+  sort()
+
+# missing governors from AR, MS, NV, NY, WV, they liekly don't have twitter
+setdiff(state.abb, states)
+
+
+# Gender Matrix -----------------------------------------------------------
+
+gender <- governor_data |>
+  select(name, gender, state) |>
+  filter(!duplicated(name)) |>
+  mutate(state_j = state,
+         gender_j = gender)
+
+combos <- gender |>
+  expand(state, state_j) |>
+  filter(state != state_j)
+
+gender_1 <- gender |>
+  select(state, gender)
+
+gender_2 <- gender |>
+  select(state_j, gender_j)
+
+# Merge data
+joined_gender <- left_join(combos, gender_1, by = "state")
+joined_gender <- left_join(joined_gender, gender_2, by = "state_j")
+
+binary_gender <- joined_gender |>
+  mutate(same_gender = ifelse(gender == gender_j, 1, 0)) |>
+  filter(same_gender == 1) |>
+  select(state, state_j)
+
+# https://stackoverflow.com/questions/16584948/how-to-create-weighted-adjacency-list-matrix-from-edge-list
+library(igraph)
+gender_graph = graph.data.frame(binary_gender)
+gender_adj = get.adjacency(gender_graph, sparse = TRUE)
+
+gender_mat <- as.matrix(gender_adj)
+
+# Party -------------------------------------------------------------------
+
+party <- governor_data |>
+  select(name, state, party) |>
+  filter(!duplicated(name)) |>
+  mutate(state_j = state,
+         party_j = party)
+
+party_1 <- party |>
+  select(state, party)
+
+party_2 <- party |>
+  select(state_j, party_j)
+
+# Merge data
+joined_party <- left_join(combos, party_1, by = "state")
+joined_party <- left_join(joined_party, party_2, by = "state_j")
+
+binary_party <- joined_party |>
+  mutate(same_party = ifelse(party == party_j, 1, 0)) |>
+  filter(same_party == 1) |>
+  select(state, state_j)
+
+party_graph = graph.data.frame(binary_party)
+party_adj = get.adjacency(party_graph, sparse = TRUE)
+party_mat <- as.matrix(party_adj)
+
+# Age ---------------------------------------------------------------------
+
+age <- governor_data |>
+  select(name, age, state) |>
+  filter(!duplicated(name)) |>
+  mutate(state_j = state,
+         age_j = age)
+
+age_1 <- age |>
+  select(state, age)
+
+age_2 <- age |>
+  select(state_j, age_j)
+
+# Merge data
+joined_age <- left_join(combos, age_1, by = "state")
+joined_age <- left_join(joined_age, age_2, by = "state_j")
+
+num_age <- joined_age |>
+  mutate(age_diff = abs(age_j - age)) |>
+  select(-c(age, age_j))
+
+age_graph = graph.data.frame(num_age)
+age_adj = get.adjacency(age_graph, sparse = TRUE, attr = "age_diff")
+age_mat <- as.matrix(age_adj)
+
+
+# Bills -------------------------------------------------------------------
+
+bill_edge <- import(here("data/bill_edgelist.Rds"))
+
+states_to_filter <- setdiff(rownames(bill_mat), states)
+
+bill_edge_filtered <- bill_edge |>
+  filter(!(state %in% states_to_filter), !(state_j %in% states_to_filter))
+
+bill_graph = graph.data.frame(bill_edge_filtered)
+bill_adj = get.adjacency(bill_graph, sparse = TRUE, attr = "score")
+bill_mat <- as.matrix(bill_adj)
+
+# Modeling ----------------------------------------------------------------
+
+state_mats <- array(NA, c(3, length(bill_mat[1,]), length(bill_mat[1,])))
+
+state_mats[1,,] <- gender_mat
+state_mats[2,,] <- party_mat
+state_mats[3,,] <- age_mat
+
+set.seed(2023)
+
+latent_lm <- netlm(bill_mat, state_mats, reps=100)
+
+latent_model <- list()
+latent_model <- summary(latent_lm)
+latent_model$names <- c("Intercept", "Same Gender", "Same Party", "Age Difference")
+
+latent_model
+
+#plot(latent_model$residuals, latent_model$fitted.values)
