@@ -9,10 +9,11 @@ editor: visual
 ```{r}
 library(tidyverse)
 library(igraph)
+library(here)
 
-bill_edge_list <- read_csv("data/edge-list.csv")
-tweets_df <- read_csv("data/full-labelled-tweets.csv")
-states_df <- read_csv("raw-data/state-traits-edgelist.csv")
+bill_edge_list <- read_csv(here("data/edge-list.csv"))
+tweets_df <- read_csv(here("data/full-labelled-tweets.csv"))
+states_df <- read_csv(here("raw-data/state-traits-edgelist.csv"))
 ```
 
 ```{r}

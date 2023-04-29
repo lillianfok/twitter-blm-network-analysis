@@ -188,6 +188,28 @@ pro_blm_graph = graph.data.frame(edge_pro_blm)
 pro_blm_adj = get.adjacency(pro_blm_graph, sparse = TRUE, attr = "prop_diff")
 pro_blm_mat <- as.matrix(pro_blm_adj)
 
+
+
+# Contiguity --------------------------------------------------------------
+
+state_traits <- import(here("raw-data/state-traits-edgelist.csv"))
+
+contiguity <- import(here("raw-data/state-traits-edgelist.csv")) |>
+  select(state_01, state_02, contig)
+
+
+# Population --------------------------------------------------------------
+
+
+
+# Proportion Black --------------------------------------------------------
+
+
+
+# Proportion White --------------------------------------------------------
+
+
+
 # Modeling ----------------------------------------------------------------
 
 state_mats <- array(NA, c(5, length(bill_mat[1,]), length(bill_mat[1,])))
