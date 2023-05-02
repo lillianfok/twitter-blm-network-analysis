@@ -31,7 +31,10 @@ missing_states <- c("AR", "MS", "NV", "NY", "WV")
 #select variables from state df
 states_edge_list <- states_edge_list %>% 
   select(state_01, state_02, contig, dif_mrp_ideology, dif_urban_index, 
-         dif_White, dif_Black)
+         dif_White, dif_Black, 
+         dif_med_inc,
+         dif_population,
+         sim_score)
 
 #select variables from state bills 
 bill_edge_list <- bill_edge_list %>% 
@@ -72,7 +75,7 @@ Create igraph network
 ```{r}
 igraph <- graph.data.frame(full_edge_list, directed = FALSE, vertices = states)
 
-plot(igraph, vertex.label = V(igraph)$state)
+#plot(igraph, vertex.label = V(igraph)$state)
 
 #DV
 similarity <- as_adjacency_matrix(igraph, attr="score")
@@ -89,14 +92,25 @@ white <- as_adjacency_matrix(igraph, attr="dif_white")
 white <- as.matrix(white)
 black <- as_adjacency_matrix(igraph, attr="dif_black")
 black <- as.matrix(black)
+urban <- as.matrix(as_adjacency_matrix(igraph, attr = "dif_urban_index"))
 
-state_matrices <- array(NA, c(5, length(contiguity[1,]),length(contiguity[1,]))) 
+state_matrices <- array(NA, c(6, length(contiguity[1,]),length(contiguity[1,]))) 
 
 state_matrices[1,,] <- contiguity
 state_matrices[2,,] <- ideology
 state_matrices[3,,] <- white
 state_matrices[4,,] <- black
 state_matrices[5,,] <- twitter
+state_matrices[6,,] <- urban
+
+
+#Run regression using just similarity score
+
+#IV state similarity score
+sim_score <- as.matrix(as_adjacency_matrix(igraph, attr = "sim_score"))
+only_sim_matrices <- array(NA, c(2, length(sim_score[1,]),length(sim_score[1,])))
+only_sim_matrices[1,,] <- sim_score
+only_sim_matrices[2,,] <- similarity
 ```
 
 Run regression
@@ -108,13 +122,28 @@ state_sim_lm<-netlm(similarity, state_matrices, reps=100)
 
 state_model <- list()
 state_model <- summary(state_sim_lm)
-state_model$names <- c("Intercept", "Contiguity", "Ideology", "White", "Black", "Twitter")
+state_model$names <- c("Intercept", "Contiguity", "Ideology", "White", "Black", "Twitter", "Urban")
 
 state_model$coefficients = round(state_model$coefficients, 2)
 state_model
 
-nl<-netlm(similarity,           # Dependent variable/network
-          list(contiguity, ideology, white, black), # List the independent variables/networks
-          reps=1000) 
+
+only_sim_lm <- netlm(similarity, only_sim_matrices, reps=100)
+sim_model <- list()
+sim_model <- summary(only_sim_lm)
+sim_model$names <- c("Intercept", "Perceived State Similarity", "Twitter")
+
+sim_model$coefficients = round(sim_model$coefficients, 2)
+sim_model
+
+#nl<-netlm(similarity,           # Dependent variable/network
+#         list(contiguity, ideology, white, black), # List the independent variables/networks
+#          reps=1000) 
+```
+
+Run regression using just similarity score
+```{r}
+#IV state similarity score
+sim_score <- as.matrix(as_adjacency_matrix())
 ```
 

@@ -17,7 +17,7 @@ keywords:
 - that do not appear in the title
 
 abstract: |
-  Twitter has become an increasingly used social networking resource for politicians, social movements, and citizens. Politicians often use twitter to communicate with the public, campaign, advocate for themselves and their policies, and send out calls to action. Twitter has also provided a convenient and public way for the public and organizations to call on elected officials to take action on relevant issues facing the public. We investigate whether state governors twitter habits regarding the Black Lives Matter movement correlates with passage of police reform laws in the state policy diffusion network.
+  Twitter has become an increasingly used social networking resource for politicians, social movements, and citizens. Politicians often use twitter to communicate with the public, campaign, advocate for themselves and their policies, and send out calls to action. Twitter has also provided a convenient and public way for the public and organizations to call on elected officials to take action on relevant issues facing the public. We investigate whether state governors twitter habits regarding the Black Lives Matter movement correlates with passage of police reform laws in the state policy adoption network.
 
 bibliography: bibliography.bib
 style: APA
