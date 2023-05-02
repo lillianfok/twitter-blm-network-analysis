@@ -16,9 +16,9 @@ library(statnet)
 library(network)
 library(here)
 
-reporting <- read_xlsx(here("data/state-decert-reporting-bills.xlsx"))
-duty_to <- read_xlsx(here("data/state-duty-to-bills.xlsx"))
-use_of_force <- read_xlsx(here("data/state-use-of-force-bills.xlsx"))
+reporting <- read_xlsx(here("raw-data/state-decert-reporting-bills.xlsx"))
+duty_to <- read_xlsx(here("raw-data/state-duty-to-bills.xlsx"))
+use_of_force <- read_xlsx(here("raw-data/state-use-of-force-bills.xlsx"))
 ```
 
 ## Clean and merge data
@@ -49,6 +49,15 @@ colnames(state_ids) <- c('state')
 #add rest of states
 bills <- state_ids %>% 
   full_join(bills, by = "state")
+
+bills_list <- bills |>
+  mutate_at(2:18, ~ ifelse(is.na(.x), 0, 1)) |>
+  rowwise() |>
+  mutate(total = sum(c_across(all_of(colnames(bills)[2:18])))) |>
+  select(state, total) |>
+  arrange(desc(total))
+
+saveRDS(bills_list, here("data/bills_list.Rds"))
 ```
 
 ## Make copies of variables
@@ -190,7 +199,6 @@ edge_list <- edge_list %>%
            `fatal-force-policy-shared` +
            `req-report-state-force-shared` +
            `req-report-fed-force-shared`) %>% 
-<<<<<<<< HEAD:analysis/bill_analysis.qmd
   subset(select = -c(sanctions, `sanctions-j`)) #%>%
   #filter(score > 1)
 

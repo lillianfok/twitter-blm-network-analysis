@@ -14,7 +14,8 @@ library(igraph)
 
 i_am("analysis/control-variable-processing.R")
 
-governor_data <- import(here("raw-data/governor_twitter_May-Oct.csv"))
+governor_data <- import(here("raw-data/governor_twitter_May-Oct.csv")) |>
+  filter(state != "DC")
 
 # get states present in dataset
 states <- governor_data |>
@@ -23,7 +24,7 @@ states <- governor_data |>
   pull(state) |>
   sort()
 
-# missing governors from AR, MS, NV, NY, WV, they liekly don't have twitter
+# missing governors from AR, MS, NV, NY, WV, they likely don't have twitter
 setdiff(state.abb, states)
 
 
@@ -60,6 +61,8 @@ gender_adj = get.adjacency(gender_graph, sparse = TRUE)
 
 gender_mat <- as.matrix(gender_adj)
 
+saveRDS(gender_mat, here("data/gov_gender_mat.Rds"))
+
 # Party -------------------------------------------------------------------
 
 party <- governor_data |>
@@ -87,6 +90,8 @@ party_graph = graph.data.frame(binary_party)
 party_adj = get.adjacency(party_graph, sparse = TRUE)
 party_mat <- as.matrix(party_adj)
 
+saveRDS(party_mat, here("data/gov_party_mat.Rds"))
+
 # Age ---------------------------------------------------------------------
 
 age <- governor_data |>
@@ -113,6 +118,7 @@ age_graph = graph.data.frame(num_age)
 age_adj = get.adjacency(age_graph, sparse = TRUE, attr = "age_diff")
 age_mat <- as.matrix(age_adj)
 
+saveRDS(age_mat, here("data/gov_age_mat.Rds"))
 
 # Bills -------------------------------------------------------------------
 
@@ -231,3 +237,18 @@ latent_model$names <- c("Intercept", "Same Gender", "Same Party", "Age Differenc
 latent_model
 
 #plot(latent_model$residuals, latent_model$fitted.values)
+
+
+# Governor Regression -----------------------------------------------------
+
+governors <- import(here("data/full-labelled-tweets.csv")) |>
+  select(name, party, gender, topic_blm_ratio, pro_blm_ratio) |>
+  filter(!duplicated(name))
+
+governor_mod <- lm(topic_blm_ratio ~ gender + party, data = governors)
+summary(governor_mod)
+plot(governor_mod)
+
+saveRDS(governor_mod, here("data/governor_mod.Rds"))
+
+
