@@ -1,0 +1,267 @@
+---
+title: "state bill analysis"
+format: html
+editor: visual
+---
+
+## State Policing Reform Analysis
+
+```{r}
+library(tidyverse)
+library(readxl)
+library(writexl)
+library(textTools)
+library(rio)
+library(statnet)
+library(network)
+library(here)
+
+reporting <- read_xlsx(here("data/state-decert-reporting-bills.xlsx"))
+duty_to <- read_xlsx(here("data/state-duty-to-bills.xlsx"))
+use_of_force <- read_xlsx(here("data/state-use-of-force-bills.xlsx"))
+```
+
+## Clean and merge data
+
+```{r}
+#convert to binary indicator
+use_of_force <- use_of_force %>% 
+  mutate(across(`ban-chokeholds`:`require-reporting-federal`, ~ replace(., !is.na(.), "1"))) %>% 
+  rename(`req-report-fed-force` = `require-reporting-federal`) %>% 
+  rename(`req-report-state-force` = `require-reporting-state`)
+
+#create state column
+duty_to <- duty_to %>% 
+  separate(state, "state")
+  
+#join df 1 and 2
+joined <- reporting %>% 
+  full_join(duty_to, by = "state")
+
+#join df 3
+bills <- joined %>% 
+  full_join(use_of_force, by = "state") #26 states total
+
+#get 50 state ids
+state_ids <- as.data.frame(state.abb)
+colnames(state_ids) <- c('state')
+  
+#add rest of states
+bills <- state_ids %>% 
+  full_join(bills, by = "state")
+```
+
+## Make copies of variables
+
+```{r}
+bills <- bills %>% 
+  rename(`req-report-state` = `require-reporting-state`) %>%
+  rename(`req-report-fed` = `require-reporting-federal`) %>% 
+  rename(`req-database` = `require-database`) #%>%
+  #janitor::clean_names()
+  
+bills <- bills %>% 
+  mutate(`state-j` = state,
+         `create-centralized-j` = `create-centralized`,
+         `decertification-j` = decertification,
+         `req-report-state-j` = `req-report-state`,
+         `req-report-fed-j` = `req-report-fed`,
+         `req-database-j` = `req-database`,
+         `duty-intervene-j` = `duty-intervene`,
+         `duty-report-j` = `duty-report`,
+         `duty-aid-j` = `duty-aid`,
+         `sanctions-j` = sanctions, 
+         `ban-chokeholds-j` = `ban-chokeholds`,
+         `restrict-chokeholds-j` = `restrict-chokeholds`,
+         `restrict-force-fleeing-j` = `restrict-force-fleeing`, 
+         `fatal-force-policy-j` = `fatal-force-policy`,
+         `req-report-state-force-j` = `req-report-state-force`,
+         `req-report-fed-force-j` = `req-report-fed-force`)
+
+```
+
+## Create all possible combinations of states
+
+```{r}
+combos <- bills %>% 
+  expand(state, `state-j`) %>% 
+  filter(state != `state-j`) #remove self ties
+#resulting df of 51*50 rows 
+```
+
+## Create and combine i and j nodes
+
+```{r}
+ DF1 <- bills %>% 
+   select(state,
+          `create-centralized`,
+          decertification,
+          `req-report-state`,
+          `req-report-fed`,
+          `req-database`,
+          `duty-intervene`,
+          `duty-report`,
+          `duty-aid`,
+          sanctions,
+          `ban-chokeholds`,
+          `restrict-chokeholds`,
+          `fatal-force-policy`,
+          `req-report-state-force`,
+          `req-report-fed-force`)
+
+ DF2 <- bills |>
+   select(`state-j`,
+          `create-centralized-j`,
+          `decertification-j`,
+          `req-report-state-j`,
+          `req-report-fed-j`,
+          `req-database-j`,
+          `duty-intervene-j`,
+          `duty-report-j`,
+          `duty-aid-j`,
+          `sanctions-j`,
+          `ban-chokeholds-j`,
+          `restrict-chokeholds-j`,
+          `fatal-force-policy-j`,
+          `req-report-state-force-j`,
+          `req-report-fed-force-j`)
+
+ ### Merge data
+ joined_data <- left_join(combos, DF1, by = "state")
+ joined_data <- left_join(joined_data, DF2, by = "state-j")
+  
+edge_list <- joined_data
+```
+
+## Calculate shared policy adoption
+
+```{r}
+#convert all numeric columns to int 
+edge_list <- type.convert(edge_list, as.is = TRUE)
+
+char_variable <- edge_list %>% 
+  select(state, `state-j`, sanctions, `sanctions-j`)
+
+#remove char columns
+edge_list <- edge_list %>% 
+  subset(select = -c(sanctions, `sanctions-j`))
+  
+#sub 0s for NAs
+edge_list[is.na(edge_list)] <- 0 
+
+#merge columns back in
+edge_list <- edge_list %>% 
+  full_join(char_variable, by = c("state", "state-j"))
+
+#calculate binary shared policy adoption variables
+edge_list <- edge_list %>% 
+  mutate(`create-centralized-shared` = ifelse(`create-centralized` + `create-centralized-j`== 2, 1, 0)) %>% 
+  mutate(`decertification-shared` = ifelse(`decertification` + `decertification-j`== 2, 1, 0)) %>% 
+  mutate(`req-report-state-shared` = ifelse(`req-report-state` + `req-report-state-j`== 2, 1, 0)) %>% 
+  mutate(`req-report-fed-shared` = ifelse(`req-report-fed` + `req-report-fed-j`== 2, 1, 0)) %>% 
+  mutate(`req-database-shared` = ifelse(`req-database` + `req-database-j` == 2, 1, 0)) %>%
+  mutate(`duty-intervene-shared` = ifelse(`duty-intervene` + `duty-intervene-j` == 2, 1, 0)) %>%
+  mutate(`duty-report-shared` = ifelse(`duty-report` + `duty-report-j` == 2, 1, 0)) %>% 
+  mutate(`duty-aid-shared` = ifelse(`duty-aid` + `duty-aid-j`== 2, 1, 0)) %>% 
+  mutate(`sanctions-shared` = ifelse(sanctions == `sanctions-j`, 1, 0)) %>% 
+  mutate(`ban-chokeholds-shared` = ifelse(`ban-chokeholds` +`ban-chokeholds-j`== 2, 1, 0)) %>% 
+  mutate(`restrict-chokeholds-shared` = ifelse(`restrict-chokeholds` +`restrict-chokeholds-j`  == 2, 1, 0)) %>% 
+  mutate(`fatal-force-policy-shared` = ifelse(`fatal-force-policy` +`fatal-force-policy-j`  == 2, 1, 0)) %>% 
+  mutate(`req-report-state-force-shared` = ifelse(`req-report-fed-force` + `req-report-fed-force-j`  == 2, 1, 0)) %>%
+  mutate(`req-report-fed-force-shared` = ifelse(`req-report-fed-force` +  `req-report-fed-force-j` == 2, 1, 0)) 
+           
+#fill in sanctions shared column
+edge_list <- edge_list %>% 
+  mutate(`sanctions-shared` = coalesce(`sanctions-shared`, 0))
+
+#calculate sum policy adoption similarity score
+edge_list <- edge_list %>% 
+  mutate(score = `create-centralized-shared` + 
+           `decertification-shared` +
+           `req-report-state-shared`+
+           `req-report-fed-shared` +
+           `req-database-shared` +
+           `duty-intervene-shared`+
+           `duty-report-shared` +
+           `duty-aid-shared` +
+           `sanctions-shared` +
+           `ban-chokeholds-shared` +
+           `restrict-chokeholds-shared` +
+           `fatal-force-policy-shared` +
+           `req-report-state-force-shared` +
+           `req-report-fed-force-shared`) %>% 
+<<<<<<<< HEAD:analysis/bill_analysis.qmd
+  subset(select = -c(sanctions, `sanctions-j`)) #%>%
+  #filter(score > 1)
+
+bill_score <- edge_list |>
+  janitor::clean_names() |>
+  select(state, state_j, score)
+
+#saveRDS(bill_score, here("data/bill_edgelist.Rds"))
+```
+
+========
+  subset(select = -c(sanctions, `sanctions-j`)) 
+
+#write.csv(edge_list, "data/edge-list.csv")
+```
+
+```{r}
+#remove NAs for better visualization
+edge_list_no_na <- edge_list%>% 
+  filter(score > 1)
+
+hist(edge_list_no_na$score)
+```
+
+>>>>>>>> 8cde7cf05298b67264a9804e40793724308e4dad:bill_network.qmd
+## Create network
+
+```{r}
+nv <- nrow(bills)
+net_bills <-network.initialize(nv) #empty network
+#name vertices
+network.vertex.names(x=net_bills) <- bills$state
+
+bills_el <- edge_list_no_na %>% 
+  select(state, `state-j`)
+net_bills[as.matrix(bills_el)] <- 1
+```
+
+```{r}
+plot(net_bills, label=network.vertex.names(net_bills))
+
+```
+
+##### PLOTTING STATNET NETWORK HERE
+
+```{r}
+set.vertex.attribute(x=net_bills,attrname="state_id",val=bills$state)
+
+#is this right
+set.edge.attribute(x=net_bills, attrname = "score", val = edge_list$score)
+
+#bill.val <- as.edgelist.matrix(edge_list,attrname="collab")
+
+gplot(net_bills, 
+      vertex.col= "blue", 
+      edge.col = "grey80", 
+      edge.lwd=0.5, 
+      gmode = "graph", 
+      displaylabels = TRUE, 
+      mode="fruchtermanreingold")
+
+```
+
+## Convert to igraph
+
+```{r}
+library(intergraph)
+detach(package:statnet)
+library(igraph)
+
+igraph <- asIgraph(net_bills)
+
+plot(igraph, layout = layout_in_circle)
+```

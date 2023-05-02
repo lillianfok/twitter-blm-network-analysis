@@ -4,7 +4,7 @@ format: html
 editor: visual
 ---
 
-## Twitter Network Analysis 
+## Twitter Network Analysis
 
 ```{r}
 library(tidyverse)
@@ -17,7 +17,6 @@ pro_blm_df <- read_csv("data/pro-blm-predictions.csv")
 tweets_df <- read_csv("raw-data/governor_twitter_May-Oct.csv")
 sample_df <- read_csv("data/full-labelled-sample.csv") 
 ```
-
 
 ```{r}
 #merge topic and pro blm dfs
@@ -56,5 +55,3 @@ governor_tweets_df <- updated_tweets_df %>%
 
 #write.csv(governor_tweets_df, "data/full-labelled-tweets.csv")
 ```
-
-
