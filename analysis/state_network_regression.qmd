@@ -33,7 +33,10 @@ missing_states <- c("AR", "MS", "NV", "NY", "WV", "DC")
 #select variables from state df
 states_edge_list <- states_edge_list %>% 
   select(state_01, state_02, contig, dif_mrp_ideology, dif_urban_index, 
-         dif_White, dif_Black)
+         dif_White, dif_Black, 
+         dif_med_inc,
+         dif_population,
+         sim_score)
 
 #select variables from state bills 
 bill_edge_list <- bill_edge_list %>% 
@@ -79,7 +82,7 @@ Create igraph network
 library(igraph)
 igraph <- graph.data.frame(full_edge_list, directed = FALSE, vertices = states)
 
-plot(igraph, vertex.label = V(igraph)$state)
+#plot(igraph, vertex.label = V(igraph)$state)
 
 #DV
 similarity <- as_adjacency_matrix(igraph, attr="score")
@@ -99,10 +102,14 @@ black <- as.matrix(black)
 # gov_gender <- import(here("data/gov_gender_mat.Rds"))
 # gov_age <- import(here("data/gov_age_mat.Rds"))
 # gov_party <- import(here("data/gov_party_mat.Rds"))
-# pro_twitter <- as_adjacency_matrix(igraph, attr = "dif_pro_ratio") |>
-#   as.matrix()
+pro_twitter <- as_adjacency_matrix(igraph, attr = "dif_pro_ratio") |>
+  as.matrix()
 
 state_matrices <- array(NA, c(6, length(contiguity[1,]),length(contiguity[1,]))) 
+
+urban <- as.matrix(as_adjacency_matrix(igraph, attr = "dif_urban_index"))
+
+state_matrices <- array(NA, c(7, length(contiguity[1,]),length(contiguity[1,]))) 
 
 state_matrices[1,,] <- contiguity
 state_matrices[2,,] <- ideology
@@ -110,6 +117,11 @@ state_matrices[3,,] <- white
 state_matrices[4,,] <- black
 state_matrices[5,,] <- twitter
 state_matrices[6,,] <- pro_twitter
+state_matrices[7,,] <- urban
+# state_matrices[7,,] <- gov_gender
+# state_matrices[8,,] <- gov_age
+# state_matrices[9,,] <- gov_party
+
 ```
 
 Run regression
@@ -122,14 +134,24 @@ state_sim_lm <- sna::netlm(similarity, state_matrices, reps=1000, mode = "graph"
 
 state_model <- list()
 state_model <- summary(state_sim_lm)
+
 state_model$names <- c("Intercept", "Contiguity", "Ideology", "White", "Black", "BLM", "Pro-BLM")
 
 state_model$coefficients = round(state_model$coefficients, 2)
 state_model
 
-saveRDS(state_model, here("data/state_model.Rds"))
+#saveRDS(state_model, here("data/state_model.Rds"))
 
-# nl <- sna::netlm(similarity,           # Dependent variable/network
-#           list(contiguity, ideology, white, black), # List the independent variables/networks
-#           reps=1000) 
+#nl<-netlm(similarity,           # Dependent variable/network
+#         list(contiguity, ideology, white, black), # List the independent variables/networks
+#          reps=1000) 
+```
+
+
+```{r}
+
+nl <- sna::netlm(similarity,           # Dependent variable/network
+          list(contiguity, ideology, white, black), # List the independent variables/networks
+          reps=1000) 
+
 ```
