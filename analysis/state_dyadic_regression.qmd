@@ -11,6 +11,7 @@ library(tidyverse)
 library(igraph)
 library(here)
 library(janitor)
+library(rio)
 #detach(package:statnet,unload=TRUE)
 
 bill_edge_list <- read_csv(here("data/edge-list.csv"))
@@ -34,14 +35,13 @@ states_edge_list <- states_edge_list %>%
   select(state_01, state_02, contig, dif_mrp_ideology, dif_urban_index, 
          dif_White, dif_Black, 
          dif_med_inc,
-         dif_population,
-         sim_score)
+         dif_population)
 
 #select variables from state bills 
 bill_edge_list <- bill_edge_list %>% 
   select(state, "state-j", score) %>% 
   filter(!(state %in% missing_states)) %>% 
-  filter(!('state-j' %in% missing_states))
+  filter(!('state-j' %in% missing_states)) 
   
 ```
 
@@ -65,13 +65,15 @@ full_edge_list <- merged_edge_list %>%
   filter(!(state %in% missing_states)) %>% 
   filter(!(state_j %in% missing_states))
 
-#
+#write.csv(full_edge_list, "data/full-edge-list.csv")
 
 states <- full_edge_list %>% 
   select(state) %>% 
   distinct() 
 
 ```
+
+Remove states w no bills 
 
 Create igraph network
 ```{r}
@@ -96,13 +98,14 @@ white <- as.matrix(white)
 black <- as_adjacency_matrix(igraph, attr="dif_black")
 black <- as.matrix(black)
 urban <- as.matrix(as_adjacency_matrix(igraph, attr = "dif_urban_index"))
+income <- as.matrix(as_adjacency_matrix(igraph, attr = "dif_med_inc"))
+#other IVs
 
+#gov_gender <- import(here("data/gov_gender_mat.Rds"))
+#gov_age <- import(here("data/gov_age_mat.Rds"))
+#gov_party <- import(here("data/gov_party_mat.Rds"))
 
-gov_gender <- import(here("data/gov_gender_mat.Rds"))
-gov_age <- import(here("data/gov_age_mat.Rds"))
-gov_party <- import(here("data/gov_party_mat.Rds"))
-
-state_matrices <- array(NA, c(9, length(contiguity[1,]),length(contiguity[1,]))) 
+state_matrices <- array(NA, c(7, length(contiguity[1,]),length(contiguity[1,]))) 
 
 
 state_matrices[1,,] <- contiguity
@@ -111,9 +114,10 @@ state_matrices[3,,] <- white
 state_matrices[4,,] <- black
 state_matrices[5,,] <- twitter
 state_matrices[6,,] <- urban
-state_matrices[7,,] <- gov_gender
-state_matrices[8,,] <- gov_age
-state_matrices[9,,] <- gov_party
+state_matrices[7,,] <- income
+# state_matrices[8,,] <- gov_gender
+# state_matrices[9,,] <- gov_age
+# state_matrices[10,,] <- gov_party
 
 ```
 
@@ -128,7 +132,7 @@ state_sim_lm <- sna::netlm(similarity, state_matrices, reps=100)
 state_model <- list()
 state_model <- summary(state_sim_lm)
 
-state_model$names <- c("Intercept", "Contiguity", "Ideology", "White", "Black", "Twitter", "Urban", "Governor Gender", "Governor Age", "Governor Party")
+state_model$names <- c("Intercept", "Contiguity", "Ideology", "White", "Black", "Twitter", "Urban", "Income")
 
 
 state_model$coefficients = round(state_model$coefficients, 2)
@@ -144,7 +148,7 @@ state_model
 ```{r}
 
 nl <- sna::netlm(similarity,           # Dependent variable/network
-          list(contiguity, ideology, white, black), # List the independent variables/networks
+          list(contiguity, ideology, white, black, urban, income), # List the independent variables/networks
           reps=1000) 
 
 ```

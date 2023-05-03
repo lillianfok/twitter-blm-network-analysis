@@ -1,0 +1,91 @@
+---
+title: "state_monadic_regression"
+format: html
+editor: visual
+---
+
+## Monadic State Linear Regression
+
+```{r}
+library(tidyverse)
+
+bill_edge_list <- read_csv(here("data/edge-list.csv"))
+tweets_df <- read_csv(here("data/full-labelled-tweets.csv"))
+states_edge_list <- read_csv(here("raw-data/state-traits-edgelist.csv"))
+```
+
+Wrangle data
+```{r}
+#summarize tweets by governor
+governor_tweets_df <- tweets_df %>% 
+  select(name, state, 
+         pro_blm_ratio, topic_blm_ratio) %>% 
+  distinct() 
+
+#5 states out of 50 not represented in twitter data and bill data
+missing_states <- c("AR", "MS", "NV", "NY", "WV", "DC")
+
+#select variables from state df
+states_df <- states_edge_list %>% 
+  select(state_01,
+         urban_index_01,
+         White_01,
+         Black_01,
+         med_inc_01,
+         population_01,
+         mrp_ideology_01) %>% 
+  distinct()
+
+#calculate bill score 
+bill_scores <- bill_edge_list %>% 
+  mutate(`bill-score` = `create-centralized` +
+           decertification +
+           `req-report-state` +
+           `req-report-fed` +
+           `req-database` +
+           `duty-intervene` +
+           `duty-report` +
+           `duty-aid` +
+           `ban-chokeholds` +
+           `restrict-chokeholds` +
+           `fatal-force-policy` +
+           `req-report-state-force` +
+           `req-report-fed-force`) %>% 
+  select(state, `bill-score`) %>% 
+  distinct()
+
+bill_scores_only <- bill_scores %>% 
+  filter(`bill-score` > 0)
+  
+```
+
+Merge into full edge list
+```{r}
+#merge gov tweets with state bills
+merged_edge_list <- bill_edge_list %>% 
+  left_join(governor_tweets_df, by = "state")
+  
+#merge with state traits
+full_edge_list <- merged_edge_list %>% 
+  left_join(states_edge_list, by = c("state" = "state_01"))
+%>% 
+  clean_names() %>% 
+  filter(!is.na(name_x)) %>% 
+  filter(!(state %in% missing_states)) 
+
+#write.csv(full_edge_list, "data/full-edge-list.csv")
+
+states <- full_edge_list %>% 
+  select(state) %>% 
+  distinct() 
+
+```
+
+
+```{r}
+mod <- lm(net_partisanship ~ ., data = county_joined_numeric)
+summary(df_linear_mod)
+
+round(summary(df_linear_mod)$coefficients,3)
+```
+
