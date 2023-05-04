@@ -8,6 +8,8 @@ editor: visual
 
 ```{r}
 library(tidyverse)
+library(here)
+library(janitor)
 
 bill_edge_list <- read_csv(here("data/edge-list.csv"))
 tweets_df <- read_csv(here("data/full-labelled-tweets.csv"))
@@ -15,6 +17,7 @@ states_edge_list <- read_csv(here("raw-data/state-traits-edgelist.csv"))
 ```
 
 Wrangle data
+
 ```{r}
 #summarize tweets by governor
 governor_tweets_df <- tweets_df %>% 
@@ -54,38 +57,56 @@ bill_scores <- bill_edge_list %>%
   select(state, `bill-score`) %>% 
   distinct()
 
-bill_scores_only <- bill_scores %>% 
-  filter(`bill-score` > 0)
   
 ```
 
 Merge into full edge list
+
 ```{r}
 #merge gov tweets with state bills
-merged_edge_list <- bill_edge_list %>% 
+merged_edge_list <- bill_scores %>% 
   left_join(governor_tweets_df, by = "state")
   
 #merge with state traits
 full_edge_list <- merged_edge_list %>% 
-  left_join(states_edge_list, by = c("state" = "state_01"))
-%>% 
+  left_join(states_df, by = c("state" = "state_01"))%>% 
   clean_names() %>% 
-  filter(!is.na(name_x)) %>% 
-  filter(!(state %in% missing_states)) 
+  filter(!(state %in% missing_states)) %>% 
+  filter(bill_score > 0)  #remove states w no bill adoptions
 
 #write.csv(full_edge_list, "data/full-edge-list.csv")
 
-states <- full_edge_list %>% 
-  select(state) %>% 
-  distinct() 
-
 ```
 
-
+Linear Regressions
 ```{r}
-mod <- lm(net_partisanship ~ ., data = county_joined_numeric)
-summary(df_linear_mod)
+#of pro blm tweet ratio
+pro_blm_mod <- lm(bill_score ~ 
+            pro_blm_ratio + 
+            urban_index_01 + 
+            white_01 + black_01 + 
+            med_inc_01 + 
+            population_01 + 
+            mrp_ideology_01, data = full_edge_list)
 
-round(summary(df_linear_mod)$coefficients,3)
+summ <- summary(pro_blm_mod)
+summ$coefficients <- round(summ$coefficients, 3)
+summ
+
+
+blm_mod <- lm(bill_score ~ 
+            topic_blm_ratio + 
+            urban_index_01 + 
+            white_01 + black_01 + 
+            med_inc_01 + 
+            population_01 + 
+            mrp_ideology_01, data = full_edge_list)
+
+summ <- summary(blm_mod)
+summ$coefficients <- round(summ$coefficients, 3)
+summ
+
 ```
+
+
 
