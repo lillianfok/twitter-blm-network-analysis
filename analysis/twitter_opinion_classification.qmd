@@ -21,9 +21,9 @@ sample <- read_csv("data/full-labelled-sample.csv")
 blm_sample <- read_csv("data/labelled-blm-sample.csv")
 ```
 
-
 ## Define dictionary function
-credit https://www.r-bloggers.com/2021/11/detecting-topics-in-mails-tweets-etc-how-to-create-a-text-classification-algorithm-in-r/ 
+
+credit https://www.r-bloggers.com/2021/11/detecting-topics-in-mails-tweets-etc-how-to-create-a-text-classification-algorithm-in-r/
 
 ```{r}
 create_dictionary <- function(data){
@@ -78,6 +78,7 @@ create_dtm <- function(data, dict) {
 ```
 
 ## Define binary classification algorithm
+
 ```{r}
 train_model <- function(data, dtm, target_topic){
  t <- factor(unlist(data[,target_topic]), levels=c(1,0))
@@ -90,6 +91,7 @@ train_model <- function(data, dtm, target_topic){
 ```
 
 ## Define evaluation function
+
 ```{r}
 evaluate_model <- function(model, data_test, dict, target_topic){
   t <- factor(unlist(data_test[,target_topic]), levels=c(1,0))
@@ -100,7 +102,6 @@ evaluate_model <- function(model, data_test, dict, target_topic){
   
 }
 ```
-
 
 ```{r}
 #merge hand labelled samples
@@ -123,6 +124,7 @@ d_test <- full_sample[-train,]
 ```
 
 ## Train model
+
 ```{r}
 #create dictionary
 dict_train <- create_dictionary(d_train)
@@ -145,6 +147,7 @@ evaluate_model(anti_mod, d_test, dict_train, "against_blm")
 ```
 
 ## Check misclassifications
+
 ```{r}
 dtm_test <- create_dtm(d_test, dict_train)
 predictions <- predict(mod, newdata = dtm_test)
@@ -156,7 +159,8 @@ d_test[which(d_test$for_blm == 0 & predictions == 1),][,] %>% View
 d_test[which(d_test$for_blm == 1 & predictions == 0),][,] %>% View
 ```
 
-## Save positive predictions 
+## Save positive predictions
+
 ```{r}
 pro_blm_predictions <- blm_tweets[which(predictions == 1),][,] 
 
@@ -167,4 +171,3 @@ pro_blm_predictions <- pro_blm_predictions %>%
 
 #write.csv(pro_blm_predictions, "data/pro-blm-predictions.csv")
 ```
-

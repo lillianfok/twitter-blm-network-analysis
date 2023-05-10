@@ -76,9 +76,29 @@ full_edge_list <- merged_edge_list %>%
 
 #write.csv(full_edge_list, "data/full-edge-list.csv")
 
+zero_bills <- merged_edge_list %>% 
+  left_join(states_df, by = c("state" = "state_01"))%>% 
+  clean_names() %>% 
+  filter(!(state %in% missing_states))
+
+```
+
+```{r}
+zero_bills |>
+  ggplot(aes(x = pro_blm_ratio, y = bill_score, color = state)) +
+  geom_point() +
+  theme_bw()
+```
+
+```{r}
+full_edge_list |>
+  ggplot(aes(x = pro_blm_ratio, y = bill_score, color = state)) +
+  geom_point() +
+  theme_bw()
 ```
 
 Linear Regressions
+
 ```{r}
 #of pro blm tweet ratio
 pro_blm_mod <- lm(bill_score ~ 
@@ -105,8 +125,43 @@ blm_mod <- lm(bill_score ~
 summ <- summary(blm_mod)
 summ$coefficients <- round(summ$coefficients, 3)
 summ
-
+plot(blm_mod)
 ```
 
+```{r}
+#of pro blm tweet ratio
+pro_blm_mod <- lm(bill_score ~ 
+            pro_blm_ratio + 
+            urban_index_01 + 
+            white_01 + black_01 + 
+            med_inc_01 + 
+            population_01 + 
+            mrp_ideology_01, data = zero_bills)
+
+summ <- summary(pro_blm_mod)
+summ$coefficients <- round(summ$coefficients, 3)
+summ
 
 
+blm_mod <- lm(bill_score ~ 
+            topic_blm_ratio + 
+            urban_index_01 + 
+            white_01 + black_01 + 
+            med_inc_01 + 
+            population_01 + 
+            mrp_ideology_01, data = zero_bills)
+
+summ <- summary(blm_mod)
+summ$coefficients <- round(summ$coefficients, 3)
+summ
+plot(blm_mod)
+```
+
+```{r}
+# library(usmap)
+# map <- zero_bills |>
+#   mutate(bill_score = as.integer(bill_score))
+# plot_usmap(data = map, values = "bill_score", color = "blue") + 
+#   scale_fill_manual(name = "# Police Reform Laws Passed (May 2020-May 2021)", label = scales::comma
+#   ) + theme(legend.position = "right")
+```
