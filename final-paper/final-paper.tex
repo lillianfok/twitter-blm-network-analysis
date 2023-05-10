@@ -22,6 +22,47 @@
 %% load any required packages here
 
 
+% Pandoc syntax highlighting
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
 
 % tightlist command for lists without linebreak
 \providecommand{\tightlist}{%
@@ -52,7 +93,8 @@
 
 \if0\blind
 {
-  \title{\bf TITLE TBD}
+  \title{\bf Tweet It LikeYou Mean It: Relationships Between Police
+Reform Legislation and Governor Twitter Behavior}
 
   \author{
         Lillian Fok \thanks{The authors gratefully acknowledge Professor
@@ -70,28 +112,27 @@ Scott LaCombe, Smith College.} \\
   \bigskip
   \bigskip
   \begin{center}
-    {\LARGE\bf TITLE TBD}
+    {\LARGE\bf Tweet It LikeYou Mean It: Relationships Between Police
+Reform Legislation and Governor Twitter Behavior}
   \end{center}
   \medskip
 } \fi
 
 \bigskip
 \begin{abstract}
-Twitter has become an increasingly used social networking resource for
-politicians, social movements, and citizens. Politicians often use
-twitter to communicate with the public, campaign, advocate for
-themselves and their policies, and send out calls to action. Twitter has
-also provided a convenient and public way for the public and
-organizations to call on elected officials to take action on relevant
-issues facing the public. We investigate whether state governors twitter
-habits regarding the Black Lives Matter movement correlates with passage
-of police reform laws in the state policy diffusion network. NOTE TO
-READERS: This is still a very rough draft, we are planning to flesh out
-our discussion and results futher.
+We investigate whether state governors twitter habits regarding the
+Black Lives Matter movement correlates with passage of police reform
+laws in the state policy adoption network. Twitter has become an
+increasingly used social networking resource for politicians, social
+movements, and citizens. Politicians often use twitter to communicate
+with the public, campaign, advocate for themselves and their policies,
+and send out calls to action. Twitter has also provided a convenient and
+public way for the public and organizations to call on elected officials
+to take action on relevant issues facing the public. We employed
 \end{abstract}
 
 \noindent%
-{\it Keywords:} 3 to 6 keywords, that do not appear in the title
+{\it Keywords:} BLM, Twitter, Social network analysis
 \vfill
 
 \newpage
@@ -113,11 +154,11 @@ of legislation without actively seeking out this information. In the
 context of the Black Lives Matter movement, politicians were facing
 unprecedented societal pressure to crack down on police violence and
 enact substantial police reform laws. Though a controversial issue that
-saw many bills die in committee in Congress, the states had more power
-to pass police reform legislation if pursued. This provides the
-motivation of our work investigating whether tweeting similarly about
-the Black Lives Matter movement correlates with similar police reform
-policy adoption.
+saw many bills die in committee in Congress CITE, the states had more
+power to pass police reform legislation if pursued. This provides the
+motivation of our work investigating whether tweeting similarly and at
+all about the Black Lives Matter movement correlates with similar police
+reform policy adoption.
 
 \hypertarget{literature-review}{%
 \section{Literature Review}\label{literature-review}}
@@ -183,8 +224,6 @@ with the movement. Because of these findings, we hypothesize that
 Democrat (and possible female) governors will be more likely to tweet
 about BLM and police reform overall.
 
-\(\text{Hypothesis}_1: \text{Democrat (and female) governors will be more likely to tweet about BLM and police} \\ \text{reform overall.}\)
-
 \hypertarget{black-lives-matter-movement-and-twitter}{%
 \subsection{Black Lives Matter movement and
 Twitter}\label{black-lives-matter-movement-and-twitter}}
@@ -246,23 +285,10 @@ will adopt a policy similar to a policy previously adopted by another
 state. \citet{Desmarais} model a latent underlying state policy
 diffusion network that correlates with media state policy emulation
 stories, finding that California tops the list, especially in more
-recent years (2005-2009), as a leading policy innovator. In Gavin
-Newsom's tweet regarding California's passage of new standards for
-police use of force in 2019, he says the passage ``{[}makes
-California{]} a model for the rest of the nation'', highlighting that he
-likely expects the rest of the states to observe the efficacy of this
-legislation and adopt it if successful. This showcases an important
-factor in state policy adoption, learning (proposed by \citet{Shipan}),
-in which states may observe policy efficacy in other states before
-deciding to implement it themselves. Given the results of Desmarais et
-al.~and Governor Newsom's statement, it is possible that we will find
-California to be a big policy adopter in our network, adopting more
-police reform policies than other states. Overall, we know that there is
-non-independence among states regarding choice of policy adoption, which
-is something we control for in our analysis by treating state policy
-adoption as a network object.
-
-\(\text{Hypothesis}_2: \text{California will be a policy innovator in our network, adopting police reform} \\ \text{legislation early on in the diffusion process.}\)
+recent years (2005-2009), as a leading policy innovator. Overall, we
+know that there is non-independence among states regarding choice of
+policy adoption, which is something we control for in our analysis by
+treating state policy adoption as a network object.
 
 In addition to the independent variable of governor Twitter behavior, we
 use state control variables as identified by Bricker and LaCombe, 2020.
@@ -291,9 +317,10 @@ political elites. However, no studies have been found that investigate
 whether promises made, stances declared, or movements talked about by
 politicians via Twitter correlate with how they implement policies.
 Because policy adoption has an underlying non-independent network
-structure, our we can transform our governor Tweeting habits into a
-network object to understand if these networks are correlated. We
-investigate if similar governor tweeting habits regarding the Black
+structure, we transformed our governor Tweeting habits into a network
+object to understand if these networks are correlated.
+
+We investigate if similar governor tweeting habits regarding the Black
 Lives Matter movement during its peak correlate with police reform
 policy adoption in their respective states. We hypothesize that state
 governors tweeting similarly about BLM will positively correlate with
@@ -311,11 +338,16 @@ about the BLM movement more often will likely adopt few police reform
 policies, as these state governors are likely less sympathetic towards
 the movement and less willing to make change.
 
-\(\text{Hypothesis}_3: \text{States with governors who tweet about BLM more in general will be more likely to adopt more similar police reform policies.}\)
+\hypertarget{hypotheses}{%
+\section{Hypotheses}\label{hypotheses}}
 
-\(\text{Hypothesis}_4: \text{States with governors who both tweet positively about the BLM movement more often will likely adopt more similar police reform policies.}\)
+\(\text{Hypothesis}_1: \text{Democrat and female governors will be more likely to tweet about BLM and police} \\ \text{reform overall.}\)
 
-\(\text{Hypothesis}_5: \text{Wtates with governors who tweet negatively about the BLM movement more often will likely adopt fewer police reform policies.}\)
+\(\text{Hypothesis}_2: \text{States with governors who tweet about BLM more in general will be more likely to adopt more similar police reform policies.}\)
+
+\(\text{Hypothesis}_3: \text{States with governors who both tweet positively about the BLM movement more often will likely adopt more similar police reform policies.}\)
+
+\(\text{Hypothesis}_4: \text{States with governors who tweet negatively about the BLM movement more often will likely adopt fewer police reform policies.}\)
 
 \hypertarget{methods}{%
 \section{Methods}\label{methods}}
@@ -367,13 +399,14 @@ law enforcement; or denigrated the legitimacy of the movement.
 We employed a topic classification algorithm using gradient-boosted
 trees and 5-fold cross validation. Gradient-boosted trees are a boosted
 sum of trees model that are able to integrate gradient descent to
-improve accuracy. Topic classification, otherwise known as text
-classification, is a supervised text mining method and a sub-field of
-natural language processing (NLP) machine learning. As a supervised The
-model was trained on a sample of approximately 3,500 hand-labeled
-tweets. Each instance could be a) on topic, b)
-pro-BLM/pro-reform/anti-police, and/or c) pro-police/anti-BLM. Most
-tweets could be categorized into either of the latter two groups.
+improve accuracy. We used the methods outline in {[}CITE{]} with binary
+classifications (pro-BLM vs not, BLM vs not). Topic classification,
+otherwise known as text classification, is a supervised text mining
+method and a sub-field of natural language processing (NLP) machine
+learning. As a supervised The model was trained on a sample of
+approximately 3,500 hand-labeled tweets. Each instance could be a) on
+topic, b) pro-BLM/pro-reform/anti-police, and/or c) pro-police/anti-BLM.
+Most tweets could be categorized into either of the latter two groups.
 
 @(Jay Inslee): ``Together, we grieve for the death of George Floyd, and
 many, many others. The events in Minnesota and across the nation the
@@ -450,28 +483,17 @@ used, as it is recommended for multivariate analyses.
 \hypertarget{results}{%
 \section{Results}\label{results}}
 
-\hypertarget{states-that-adopted-the-most-police-reform-legislation}{%
-\subsubsection{States that adopted the most police reform
-legislation}\label{states-that-adopted-the-most-police-reform-legislation}}
+\begin{center}
 
-\begin{longtable}[]{@{}lr@{}}
-\toprule()
-state & total \\
-\midrule()
-\endhead
-IL & 14 \\
-WA & 14 \\
-CO & 13 \\
-MA & 12 \\
-VA & 12 \\
-\bottomrule()
-\end{longtable}
+  \includegraphics[width=150mm,scale=0.5]{"/Users/michelesezgin/Desktop/Classes/SDS-338/final-project/final-paper/figures/BC-state-policy.png"}
+  
+\end{center}
 
-\(\hspace*{\fill} \footnotesize \text{Figure 1. Top police reform policy-adopting states}\)
+\(\hspace*{\fill} \footnotesize \text{Figure 1. Brennan Center for Justice police reform policy adoption map}\)
 
 The top five states that adopted the most police reform laws from May
 25, 2020-May 21, 2021 were Illinois, Washington, Colorado,
-Massachusetts, and Virginia.
+Massachusetts, and Virginia.\textbackslash{}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1467}}
@@ -502,11 +524,11 @@ Republican & -0.015 & 0.015 & -0.951 & 0.347 \\
 \(\hspace*{\fill} \footnotesize \text{Figure 2. Regression of BLM tweeting proportion on governor gender and party}\)
 
 \begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1618}}
-  >{\raggedleft\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.3235}}
-  >{\raggedleft\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1176}}
-  >{\raggedleft\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1176}}
-  >{\raggedleft\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2794}}@{}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1594}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.3188}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1159}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1159}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2899}}@{}}
 \toprule()
 \begin{minipage}[b]{\linewidth}\raggedright
 Variable
@@ -517,7 +539,7 @@ Pr(\textless=b)
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
 Pr(\textgreater=b)
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
-Pr(\textgreater=\textbar b\textbar{}
+Pr(\textgreater=\textbar b\textbar)
 \end{minipage} \\
 \midrule()
 \endhead
@@ -535,31 +557,106 @@ Pro-BLM & 1.05 & 0.546 & 0.454 & 0.937 \\
 \(\hspace*{\fill} \footnotesize \text{ideology, percent Black, percent white, difference in proportion of BLM tweets and difference in}\)
 \(\hspace*{\fill} \footnotesize \text{proportion of pro-BLM tweets.}\)
 
-Note: Unfortunately, the anti-BLM classification model was not accurate
-enough to include it in our analysis.
+None of our estimated coefficient values were significantly different
+from their predicted null hypothesis values in our police reform
+legislation-adoption network regression, and neither gender nor party
+were significant predictors in the model predicting BLM tweeting
+frequency. This is contrary to our original hypotheses, and points to a
+need for further analysis. We wondered, does tweeting about BLM and
+tweeting pro-BLM sentiments correlate with police reform policy adoption
+in a non-network context (monadic analysis)? How does this relationship
+change if we filter for states who passed at least one police reform
+law?
+
+\hypertarget{follow-up-hypotheses}{%
+\subsection{Follow-up Hypotheses}\label{follow-up-hypotheses}}
 
 \hypertarget{discussion}{%
 \section{Discussion}\label{discussion}}
 
 None of our estimated coefficient values were significantly different
 from their predicted null hypothesis values in our police reform
-legislation-adoption regression, and none of our predictors were
-significant in the model predicting BLM tweeting frequency. This is
-contray to our original hypotheses, and points to a need for further
-analysis.
+legislation-adoption network regression, and neither gender nor party
+were significant predictors in the model predicting BLM tweeting
+frequency. This is contrary to our original hypotheses, and points to a
+need for further analysis. Unfortunately, the anti-BLM classification
+model was not accurate enough to include it in our analysis.
+
+We retain the null in the cases of hypotheses 1,
+
+Interestingly, the
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# BLM vs policy plot}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# pro{-}BLM vs policy plot}
+\end{Highlighting}
+\end{Shaded}
 
 \hypertarget{limitations-and-future-work}{%
 \section{Limitations and Future
 Work}\label{limitations-and-future-work}}
 
+Because our data is censored, in that we don't know what happened
+regarding state police reform policy adoption post-May 21 2021. It is
+possible that states continued to adopt police reform policies in after
+this timepoint, though we hypothesize it is less likely given the
+decline in popularity of the BLM movement. We additionally do not know
+if states adopted police reform policies prior to the period studied. It
+is possible that states did not adopt police reform policies during the
+given period because they already had robust police reform laws in
+place.
+
+With limited data, i.e.~15 possible bills for our states to adopt, it is
+difficult to understand the relationship between BLM tweeting and police
+reform policy adoption. Though other bills in this area may have been
+adopted at other points in time, this general question should be
+expanded to other policy topics not only be more generalizable but also
+to provide our models with more predictive power and a stronger
+conclusion. Generally, does tweeting support (or opposition) for a
+specific topic correlate with passing or not passing policies in that
+topic area? This also implies extending to other legislative contexts
+(i.e.~Congress, international politics).
+
+Policy adoption is often not the result of just one person
+(i.e.~governor's) decisions, but often the result of the efforts and
+opinions of the state legislature as a whole. Future work should focus
+on investigating the relationship between state congressperson or
+senator tweeting habits and their voting habits and controlling for
+their impact, if the sole goal is to understand the relationship between
+state governor tweeting/social media use and state policy adoption.
+
+We also would like to investigate the relationship between ``anti-BLM''
+tweets and ``anti-BLM'' bills in the future. In response to the BLM
+protests that took place in the wake of George Floyd's death, many
+(Republican) lawmakers pushed anti-protest laws (CITE). Unfortunately
+our anti-BLM classifier was not accurate enough for us to use in this
+research, but future studies could investigate other more accurate NLP
+topic-classifiers that would hopefully offer better performance in this
+area. It is important to note however that anti-BLM sentiment may be
+``fuzzier'' and harder to classify in general than pro-BLM sentiment.
+
 It would be interesting to run a time-series dyadic analysis, to
-understand who the policy innovators are in our network. For example,
-Governor Newsom tweeted that he thought California would be a model for
-the rest of the nation by passing their police reform policy, so it
-would be worthwhile to attempt to investigate and validate these claims
-(though it is unlikely California is a major policy innovator for May
-25, 2020-May 21, 2021 police reform legislation considering they passed
-one law.)
+understand who the policy innovators are in our network. For example, in
+Gavin Newsom's tweet regarding California's passage of new standards for
+police use of force in 2019, he says the passage ``{[}makes
+California{]} a model for the rest of the nation'', highlighting that he
+likely expects the rest of the states to observe the efficacy of this
+legislation and adopt it if successful. This showcases an important
+factor in state policy adoption, learning (proposed by \citet{Shipan}),
+in which states may observe policy efficacy in other states before
+deciding to implement it themselves. Given the results of Desmarais et
+al.~and Governor Newsom's statement, it is possible that California to
+be a big policy adopter in our network, adopting more police reform
+policies than other states. It would be worthwhile to attempt to
+investigate and validate these claims (though it is unlikely California
+is a major policy innovator for May 25, 2020-May 21, 2021 police reform
+legislation considering they passed one law.)
 
 \bibliographystyle{agsm}
 \bibliography{bibliography.bib}

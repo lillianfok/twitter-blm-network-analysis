@@ -249,6 +249,10 @@ governor_mod <- lm(topic_blm_ratio ~ gender + party, data = governors)
 summary(governor_mod)
 plot(governor_mod)
 
+pro_governor_mod <- lm(pro_blm_ratio ~ gender + party, data = governors)
+summary(pro_governor_mod)
+plot(governor_mod)
+
 saveRDS(governor_mod, here("data/governor_mod.Rds"))
 
 

@@ -1,0 +1,112 @@
+---
+title: "state_monadic_regression"
+format: html
+editor: visual
+---
+
+## Monadic State Linear Regression
+
+```{r}
+library(tidyverse)
+library(here)
+library(janitor)
+
+bill_edge_list <- read_csv(here("data/edge-list.csv"))
+tweets_df <- read_csv(here("data/full-labelled-tweets.csv"))
+states_edge_list <- read_csv(here("raw-data/state-traits-edgelist.csv"))
+```
+
+Wrangle data
+
+```{r}
+#summarize tweets by governor
+governor_tweets_df <- tweets_df %>% 
+  select(name, state, 
+         pro_blm_ratio, topic_blm_ratio) %>% 
+  distinct() 
+
+#5 states out of 50 not represented in twitter data and bill data
+missing_states <- c("AR", "MS", "NV", "NY", "WV", "DC")
+
+#select variables from state df
+states_df <- states_edge_list %>% 
+  select(state_01,
+         urban_index_01,
+         White_01,
+         Black_01,
+         med_inc_01,
+         population_01,
+         mrp_ideology_01) %>% 
+  distinct()
+
+#calculate bill score 
+bill_scores <- bill_edge_list %>% 
+  mutate(`bill-score` = `create-centralized` +
+           decertification +
+           `req-report-state` +
+           `req-report-fed` +
+           `req-database` +
+           `duty-intervene` +
+           `duty-report` +
+           `duty-aid` +
+           `ban-chokeholds` +
+           `restrict-chokeholds` +
+           `fatal-force-policy` +
+           `req-report-state-force` +
+           `req-report-fed-force`) %>% 
+  select(state, `bill-score`) %>% 
+  distinct()
+
+  
+```
+
+Merge into full edge list
+
+```{r}
+#merge gov tweets with state bills
+merged_edge_list <- bill_scores %>% 
+  left_join(governor_tweets_df, by = "state")
+  
+#merge with state traits
+full_edge_list <- merged_edge_list %>% 
+  left_join(states_df, by = c("state" = "state_01"))%>% 
+  clean_names() %>% 
+  filter(!(state %in% missing_states)) %>% 
+  filter(bill_score > 0)  #remove states w no bill adoptions
+
+#write.csv(full_edge_list, "data/full-edge-list.csv")
+
+```
+
+Linear Regressions
+```{r}
+#of pro blm tweet ratio
+pro_blm_mod <- lm(bill_score ~ 
+            pro_blm_ratio + 
+            urban_index_01 + 
+            white_01 + black_01 + 
+            med_inc_01 + 
+            population_01 + 
+            mrp_ideology_01, data = full_edge_list)
+
+summ <- summary(pro_blm_mod)
+summ$coefficients <- round(summ$coefficients, 3)
+summ
+
+
+blm_mod <- lm(bill_score ~ 
+            topic_blm_ratio + 
+            urban_index_01 + 
+            white_01 + black_01 + 
+            med_inc_01 + 
+            population_01 + 
+            mrp_ideology_01, data = full_edge_list)
+
+summ <- summary(blm_mod)
+summ$coefficients <- round(summ$coefficients, 3)
+summ
+
+```
+
+
+
