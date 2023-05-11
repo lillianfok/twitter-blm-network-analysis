@@ -87,11 +87,11 @@ issues such as the BLM movement, but little work has been done to
 investigate whether they follow up on these stances with legislative
 action. Tweets were classified as either related to BLM and/or pro-BLM
 or not using gradient-boosted trees. By investigating the passage of
-police reform laws from May 2020-May 2021, we find no significant impact
-of BLM and/or pro-BLM tweeting rates when treating states/governors as a
-network or as independent observations. Future research should focus on
-refining tweet topic classification and broadening the scope of
-tweet/legislation topics studied.
+police reform laws from May 2020-May 2021, we find no significant
+relationship between BLM and/or pro-BLM tweeting rates when treating
+states/governors as a network or as independent observations. Future
+research should focus on refining tweet topic classification and
+broadening the scope of tweet/legislation topics studied.
 \end{abstract}
 
 \noindent%
@@ -107,7 +107,7 @@ tweet/legislation topics studied.
 \(\hspace{.5cm}\) Twitter users often observe elected officials
 communicating their stance on political issues or making promises of
 policy change via Twitter. Politicians and their teams invest
-significant effort into curating a tweets and communicating with the
+significant effort into curating tweets and communicating with the
 public via online social networking sites. When evaluating the political
 performance of politicians, we expect that they ``practice what they
 preach'' and at least make good-faith attempts to pass legislation
@@ -117,11 +117,11 @@ of legislation without actively seeking out this information. In the
 context of the Black Lives Matter movement, politicians were facing
 unprecedented societal pressure to crack down on police violence and
 enact substantial police reform laws. Though a controversial issue that
-saw many bills die in committee in Congress, the states had more power
-to pass police reform legislation if pursued. This provides the
-motivation of our work investigating whether tweeting similarly and at
-all about the Black Lives Matter movement correlates with similar police
-reform policy adoption.
+saw many bills die in committee in Congress \citep{Bass}, the states had
+more power to pass police reform legislation if pursued. This provides
+the motivation of our work investigating whether tweeting similarly and
+at all about the Black Lives Matter movement correlates with similar
+police reform policy adoption.
 
 We employed a gradient-boosted tree topic-classification algorithm to
 classify tweets as either BLM and/or pro-BLM or not. We then employed
@@ -174,8 +174,8 @@ public perception of government Twitter feeds, and Park et al.'s work
 may not be applicable in the U.S. political context. Former U.S.
 president Donald Trump, the highest elected official in the U.S. from
 2016-2020, frequently made false or misleading claims on Twitter, and
-these false or misleading tweets were among his most popular (Rattner,
-2021).
+these false or misleading tweets were among his most popular
+\citep{Rattner}.
 
 \(\hspace{.5cm}\) The way politicians are using Twitter can also be
 broken down by party, gender, and incumbency, among other factors.
@@ -274,9 +274,9 @@ In addition to the independent variable of governor Twitter behavior, we
 use state control variables as identified by Bricker and LaCombe, 2020.
 Their pooled dyadic event history analysis predicting similar policy
 adoption features 9 state level attributes, of which we selected
-contiguity, percent white, median income, population, percent urban, and
-census region. (variables may change) Contiguity is defined as a binary
-value of shared state borders. (more codebook definitions) We
+contiguity, percent white, median income, population, and percent urban.
+We also selected population and ideology. Contiguity is defined as a
+binary value of shared state borders. (more codebook definitions) We
 additionally include a measure of percent Black to account for Black
 Lives Matter movement interests. The state level attributes are sourced
 from the Correlates of State Policy dataset, which contains over 3000
@@ -323,11 +323,11 @@ the movement and less willing to make change.
 
 \(\text{Hypothesis}_1: \text{Democrat and female governors will be more likely to tweet about BLM and police} \\ \text{reform overall.}\)
 
-\(\text{Hypothesis}_2: \text{States with governors who tweet about BLM more in general will be more likely to adopt more similar police reform policies.}\)
+\(\hspace{-.25in} \text{Hypothesis}_2: \text{States with governors who tweet about BLM more in general will be more likely to} \\ \text{adopt more similar police reform policies.}\)
 
-\(\text{Hypothesis}_3: \text{States with governors who both tweet positively about the BLM movement more often will likely adopt more similar police reform policies.}\)
+\(\hspace{-.25in} \text{Hypothesis}_3: \text{States with governors who both tweet positively about the BLM movement more} \\ \text{often will likely adopt more similar police reform policies.}\)
 
-\(\text{Hypothesis}_4: \text{States with governors who tweet negatively about the BLM movement more often will likely adopt fewer police reform policies.}\)
+\(\hspace{-.25in} \text{Hypothesis}_4: \text{States with governors who tweet negatively about the BLM movement more} \\ \text{often will likely adopt fewer police reform policies.}\)
 
 \hypertarget{methods}{%
 \section{Methods}\label{methods}}
@@ -336,12 +336,12 @@ the movement and less willing to make change.
 data of US state governors over the period of May 1, 2020 to October 31,
 2020. It was acquired from the open dataset by Zhaozhi Li and Chenglin
 Zhang from an article titled ``Senators' Response to Black Lives Matter
-during the 2020 Election Campaign: Evidence from Twitter''. The original
-web scraping was conducted using the Selenium Python package. The
-dataset includes 30,490 tweets with the associated governor name, party,
-Twitter account, time, and text. The text contains the main body of the
-tweet as well as any hashtags (e.g.~\#BackTheBlue, \#BlackLivesMatter,
-\#COVID19).
+during the 2020 Election Campaign: Evidence from Twitter''
+\citep{senator}. The original web scraping was conducted using the
+Selenium Python package. The dataset includes 30,490 tweets with the
+associated governor name, party, Twitter account, time, and text. The
+text contains the main body of the tweet as well as any hashtags
+(e.g.~\#BackTheBlue, \#BlackLivesMatter, \#COVID19).
 
 The time period of the tweet data overlaps with the murder of George
 Floyd by police officer Derek Chauvin on May 25, 2020, an event that
@@ -379,11 +379,11 @@ law enforcement; or denigrated the legitimacy of the movement.
 We employed a topic classification algorithm using gradient-boosted
 trees and 5-fold cross validation. Gradient-boosted trees are a boosted
 sum of trees model that are able to integrate gradient descent to
-improve accuracy. We used the methods outline in {[}CITE{]} with binary
-classifications (pro-BLM vs not, BLM vs not). Topic classification,
-otherwise known as text classification, is a supervised text mining
-method and a sub-field of natural language processing (NLP) machine
-learning. As a supervised The model was trained on a sample of
+improve accuracy. We used the methods outline in \citet{topic}, with
+binary classifications (pro-BLM vs not, BLM vs not). Topic
+classification, otherwise known as text classification, is a supervised
+text mining method and a sub-field of natural language processing (NLP)
+machine learning. As a supervised The model was trained on a sample of
 approximately 3,500 hand-labeled tweets. Each instance could be a) on
 topic, b) pro-BLM/pro-reform/anti-police, and/or c) pro-police/anti-BLM.
 Most tweets could be categorized into either of the latter two groups.
@@ -933,13 +933,13 @@ passed by state}
 \section{Limitations and Future
 Work}\label{limitations-and-future-work}}
 
-Because our data is censored, in that we don't know what happened
-regarding state police reform policy adoption post-May 21 2021. It is
-possible that states continued to adopt police reform policies in after
-this timepoint, though we hypothesize it is less likely given the
-decline in popularity of the BLM movement. We additionally do not know
-if states adopted police reform policies prior to the period studied. It
-is possible that states did not adopt police reform policies during the
+Our data is censored, in that we don't know what happened regarding
+state police reform policy adoption post-May 21 2021. It is possible
+that states continued to adopt police reform policies in after this
+timepoint, though we hypothesize it is less likely given the decline in
+popularity of the BLM movement. We additionally do not know if states
+adopted police reform policies prior to the period studied. It is
+possible that states did not adopt police reform policies during the
 given period because they already had robust police reform laws in
 place.
 
@@ -965,12 +965,13 @@ state governor tweeting/social media use and state policy adoption.
 We also would like to investigate the relationship between ``anti-BLM''
 tweets and ``anti-BLM'' bills in the future. In response to the BLM
 protests that took place in the wake of George Floyd's death, many
-(Republican) lawmakers pushed anti-protest laws (CITE). Unfortunately
-our anti-BLM classifier was not accurate enough for us to use in this
-research, but future studies could investigate other more accurate NLP
-topic-classifiers that would hopefully offer better performance in this
-area. It is important to note however that anti-BLM sentiment may be
-``fuzzier'' and harder to classify in general than pro-BLM sentiment.
+(Republican) lawmakers pushed anti-protest laws \citep{Gabbatt}.
+Unfortunately our anti-BLM classifier was not accurate enough for us to
+use in this research, but future studies could investigate other more
+accurate NLP topic-classifiers that would hopefully offer better
+performance in this area. It is important to note however that anti-BLM
+sentiment may be ``fuzzier'' and harder to classify in general than
+pro-BLM sentiment.
 
 It would be interesting to run a time-series dyadic analysis, to
 understand who the policy innovators are in our network. For example, in
