@@ -1,0 +1,54 @@
+---
+title: "state choropleth map"
+format: html
+editor: visual
+---
+
+## State Police Reform Bill Map
+
+```{r}
+library(sf,quietly = T)
+library(leaflet)
+library(tigris)
+library(tidyverse)
+library(dplyr)
+
+states <- states(cb = TRUE) 
+bills <- read_csv("data/edge-list.csv")
+```
+
+Data wrangling
+```{r}
+#get only state scores
+bills_df <- bills %>% 
+  select(state, 'bill-score') %>% 
+  distinct() 
+  
+
+merged_states <- states %>% 
+  rename(state = STUSPS) %>% 
+  inner_join(bills_df, by = "state") 
+
+
+#base leaflet map
+us_map <- leaflet(width = "100%") %>%
+  addProviderTiles(providers$CartoDB.Positron) %>% 
+  clearBounds()
+
+#color brewer palette
+color <- colorNumeric("Greens", merged_states$'bill-score')
+
+
+#visualization
+us_map %>% 
+  addPolygons(data = merged_states,
+              weight = 0.7,
+              fillColor = ~color(merged_states$'bill-score'),
+              fillOpacity = 0.7) %>% 
+  addLegend("bottomright", 
+            pal = color, 
+            values = as.double(merged_states$'bill-score'),
+            title = "Bills Passed", 
+            opacity = 1)
+View(merged_states)
+```
