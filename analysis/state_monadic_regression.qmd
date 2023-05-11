@@ -1,6 +1,7 @@
 ---
 title: "state_monadic_regression"
-format: html
+pdf-engine: lualatex
+format: pdf
 editor: visual
 ---
 
@@ -40,73 +41,73 @@ states_df <- states_edge_list %>%
   distinct()
 
 #calculate bill score 
-bill_scores <- bill_edge_list %>% 
-  mutate(`bill-score` = `create-centralized` +
-           decertification +
-           `req-report-state` +
-           `req-report-fed` +
-           `req-database` +
-           `duty-intervene` +
-           `duty-report` +
-           `duty-aid` +
-           `ban-chokeholds` +
-           `restrict-chokeholds` +
-           `fatal-force-policy` +
-           `req-report-state-force` +
-           `req-report-fed-force`) %>% 
-  select(state, `bill-score`) %>% 
-  distinct()
+#bill_scores <- bill_edge_list %>% 
+#   mutate(`bill-score` = `create-centralized` +
+#            decertification +
+#            `req-report-state` +
+#            `req-report-fed` +
+#            `req-database` +
+#            `duty-intervene` +
+#            `duty-report` +
+#            `duty-aid` +
+#            `ban-chokeholds` +
+#            `restrict-chokeholds` +
+#            `fatal-force-policy` +
+#            `req-report-state-force` +
+#            `req-report-fed-force`) %>% 
+#   select(state, `bill-score`) %>% 
+#   distinct()
 
   
 ```
 
-Merge into full edge list
+<!-- Merge into full edge list -->
 
-```{r}
-#merge gov tweets with state bills
-merged_edge_list <- bill_scores %>% 
-  left_join(governor_tweets_df, by = "state")
-  
-#merge with state traits
-full_edge_list <- merged_edge_list %>% 
-  left_join(states_df, by = c("state" = "state_01"))%>% 
-  clean_names() %>% 
-  filter(!(state %in% missing_states)) %>% 
-  filter(bill_score > 0)  #remove states w no bill adoptions
+<!-- ```{r} -->
+<!-- #merge gov tweets with state bills -->
+<!-- merged_edge_list <- bill_scores %>%  -->
+<!--   left_join(governor_tweets_df, by = "state") -->
 
-#write.csv(full_edge_list, "data/full-edge-list.csv")
+<!-- #merge with state traits -->
+<!-- full_edge_list <- merged_edge_list %>%  -->
+<!--   left_join(states_df, by = c("state" = "state_01"))%>%  -->
+<!--   clean_names() %>%  -->
+<!--   filter(!(state %in% missing_states)) %>%  -->
+<!--   filter(bill_score > 0)  #remove states w no bill adoptions -->
 
-```
+<!-- #write.csv(full_edge_list, "data/full-edge-list.csv") -->
 
-Linear Regressions
-```{r}
-#of pro blm tweet ratio
-pro_blm_mod <- lm(bill_score ~ 
-            pro_blm_ratio + 
-            urban_index_01 + 
-            white_01 + black_01 + 
-            med_inc_01 + 
-            population_01 + 
-            mrp_ideology_01, data = full_edge_list)
+<!-- ``` -->
 
-summ <- summary(pro_blm_mod)
-summ$coefficients <- round(summ$coefficients, 3)
-summ
+<!-- Linear Regressions -->
+<!-- ```{r} -->
+<!-- #of pro blm tweet ratio -->
+<!-- pro_blm_mod <- lm(bill_score ~  -->
+<!--             pro_blm_ratio +  -->
+<!--             urban_index_01 +  -->
+<!--             white_01 + black_01 +  -->
+<!--             med_inc_01 +  -->
+<!--             population_01 +  -->
+<!--             mrp_ideology_01, data = full_edge_list) -->
+
+<!-- summ <- summary(pro_blm_mod) -->
+<!-- summ$coefficients <- round(summ$coefficients, 3) -->
+<!-- summ -->
 
 
-blm_mod <- lm(bill_score ~ 
-            topic_blm_ratio + 
-            urban_index_01 + 
-            white_01 + black_01 + 
-            med_inc_01 + 
-            population_01 + 
-            mrp_ideology_01, data = full_edge_list)
+<!-- blm_mod <- lm(bill_score ~  -->
+<!--             topic_blm_ratio +  -->
+<!--             urban_index_01 +  -->
+<!--             white_01 + black_01 +  -->
+<!--             med_inc_01 +  -->
+<!--             population_01 +  -->
+<!--             mrp_ideology_01, data = full_edge_list) -->
 
-summ <- summary(blm_mod)
-summ$coefficients <- round(summ$coefficients, 3)
-summ
+<!-- summ <- summary(blm_mod) -->
+<!-- summ$coefficients <- round(summ$coefficients, 3) -->
+<!-- summ -->
 
-```
+<!-- ``` -->
 
 
 

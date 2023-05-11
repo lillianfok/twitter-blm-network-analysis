@@ -209,8 +209,7 @@ edge_list_no_na <- edge_list%>%
 hist(edge_list_no_na$score)
 ```
 
->>>>>>>> 8cde7cf05298b67264a9804e40793724308e4dad:bill_network.qmd
-## Create network
+> > > > > > > > 8cde7cf05298b67264a9804e40793724308e4dad:bill_network.qmd \## Create network
 
 ```{r}
 nv <- nrow(bills)
