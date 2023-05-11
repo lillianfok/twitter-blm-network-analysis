@@ -240,7 +240,7 @@ This is 35% and 32% for monadic regression models with BLM and pro-BLM, respecti
 
 Among states who passed police reform legislation, every 1% increase in proportion of BLM tweets is expected to result in a 0.45 increase in bills passed on average when controlling for urban index, % white, % Black, median income, population size, and ideology score. Similarly among states who passed police reform legislation, every 1% increase in proportion of pro-BLM tweets is expected to result in a 0.34 increase in bills passed on average when controlling for urban index, % white, % Black, median income, population size, and ideology score.
 
-Looking at Figure 2, we can see that by filtering for states that passed at least one police reform policy (i.e. removing the 5 dots on the y-intercept), a clearer relationship between BLM tweeting proportion and police reform laws passed starts to emerge. However, we would like to restate that we are unsure if these observations are adding signal or noise to our data set. In Figure 3, removing the observations where no bills were passed has a less clear effect on the relationship between pro-BLM tweeting proportion and polcie reform laws passed.
+Looking at Figures 2 and 3, we can see that by filtering for states that passed at least one police reform policy (i.e. removing the 5 dots on the y-intercept), a clearer relationship between BLM and pro-BLM tweeting proportion and police reform laws passed starts to emerge. However, we would like to restate that we are unsure if these observations are adding signal or noise to our data set.
 
 ```{r, echo = FALSE, fig.cap = "Plot of proportion of BLM tweets vs police reform laws passed by state"}
 # BLM vs policy plot
