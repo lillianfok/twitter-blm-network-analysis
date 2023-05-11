@@ -99,72 +99,133 @@ To measure similarity of BLM tweeting frequency between governors, we measured t
 
 We ran a network regression with 1000 repetitions, regressing the shared police reform bills network on. The Quadratic Assignment Procedure (QAP) permutation test, using Dekker's "semi-partialling plus" procedure was used, as it is recommended for multivariate analyses.
 
-Because BLM and pro-BLM tweeting proportions are correlated [SEE FIGURE BLANK], we ran models with either one or the other.
+Because BLM and pro-BLM tweeting proportions are correlated (see Figure 1), we ran models with either one or the other, but not both.
 
-# Results
-
-```{r, echo = FALSE, message = FALSE}
+```{r, include = FALSE}
 library(here)
+library(rio)
 library(tidyverse)
 i_am("final-paper/final-paper.Rmd")
 ```
 
-<!-- \begin{center} -->
+```{r load-data, include = FALSE}
+full_lab_tweets <- import(here("data/full-labelled-tweets.csv"))
+samp_blm_tweets <- import(here("raw-data/labelled-sample.csv"))
+pro_blm_samp <- import(here("raw-data/labelled-blm-sample.csv"))
+state_info <- import(here("data/state_info.Rds"))
+```
 
-<!--   \includegraphics[width=150mm,scale=0.5]{"/Users/michelesezgin/Desktop/Classes/SDS-338/final-project/final-paper/figures/BC-state-policy.png"} -->
+```{r, echo = FALSE, fig.cap = "Plot of predicted BLM vs pro-BLM tweets per governor"}
+full_lab_tweets |>
+  filter(!duplicated(state)) |>
+  ggplot(aes(x = topic_blm_ratio, y = pro_blm_ratio, color = state)) +
+  geom_point() +
+  theme_bw() +
+  labs(title = "Proportion of BLM and pro-BLM tweets per governor\npossibly correlated",
+       x = "Proportion of BLM tweets",
+       y = "Proportion of pro-BLM tweets",
+       color = "State")
+```
 
-<!-- \end{center} -->
 
-<!-- \(\hspace*{\fill} \footnotesize \text{Figure 1. Brennan Center for Justice police reform policy adoption map}\)  -->
+```{r, include = FALSE}
+# p <- samp_blm_tweets |> 
+#   summarize(prop = sum(topic_blm)/n()) |>
+#   pull(prop)
+# ci_lb_pro <- qbinom(p, 30490, .05)
+# ci_ub_pro <- qbinom(p, 30490, .95)
+```
+
+
+# Results
+
+```{r, echo = FALSE}
+
+```
 
 The top five states that adopted the most police reform laws from May 25, 2020-May 21, 2021 were Illinois, Washington, Colorado, Massachusetts, and Virginia.
 
-```{r, echo = FALSE, fig.cap = ""}
+```{r, echo = FALSE}
 # BLM vs gender and party
 gov_mod <- readRDS(here("final-paper/figures/governor_mod.Rds"))
+# table
 tibble(Variable = c("Intercept", "Male", "Republican"), "Estimated Coefficient" = round(gov_mod$coefficients, 3), "Standard Error" = round(summary(gov_mod)$coefficients[,2], 3), "t-value" = round(summary(gov_mod)$coefficients[,3], 3), "Pr(>|t|)" = round(summary(gov_mod)$coefficients[,4], 3)) |>
-  knitr::kable()
+  knitr::kable(caption = "Regression of BLM tweeting proportion on governor gender and party")
 ```
 
-```{r}
+```{r, echo = FALSE}
 # pro-BLM vs gender and party
-
+pro_gov_mod <- readRDS(here("final-paper/figures/pro_governor_mod.Rds"))
+# table
+tibble(Variable = c("Intercept", "Male", "Republican"), "Estimated Coefficient" = round(pro_gov_mod$coefficients, 3), "Standard Error" = round(summary(pro_gov_mod)$coefficients[,2], 3), "t-value" = round(summary(pro_gov_mod)$coefficients[,3], 3), "Pr(>|t|)" = round(summary(pro_gov_mod)$coefficients[,4], 3)) |>
+  knitr::kable(caption = "Regression of pro-BLM tweeting proportion on governor gender and party")
 ```
 
 
 <!-- \(\hspace*{\fill} \footnotesize \text{Figure 2. Regression of BLM tweeting proportion on governor gender and party}\) -->
 
 ```{r, echo = FALSE}
-# BLM Network regression 
-regression <- readRDS(here("final-paper/figures/state_model.Rds"))
-tibble(Variable = c("Intercept", "Contiguity", "Ideology", "White", "Black", "BLM", "Pro-BLM"), "Estimated Coefficient" = regression$coefficients, "Pr(<=b)" = regression$pleeq, "Pr(>=b)" = regression$pgreq, "Pr(>=|b|)" = regression$pgreqabs) |>
-  knitr::kable()
+# BLM Network regression All
+regression <- readRDS(here("final-paper/figures/blm_net_reg.Rds"))
+tibble(Variable = c("Intercept", "BLM", "Contiguity", "Black", "White", "Urban", "Income", "Ideology", "Population"), "Estimated Coefficient" = regression$coefficients, "Pr(<=b)" = regression$pleeq, "Pr(>=b)" = regression$pgreq, "Pr(>=|b|)" = regression$pgreqabs) |>
+  knitr::kable(caption = "Network regression of shared police reform policies on difference in proportion of BLM tweets between governors, contiguity, difference in % Black population, difference in % white population, difference in state % urban, difference in median income, and difference in state ideology")
 ```
 
 <!-- \(\hspace*{\fill} \footnotesize \text{Figure 3. Network regression of shared police reform policy on state contiguity, difference in state}\)  -->
 <!-- \(\hspace*{\fill} \footnotesize \text{ideology, percent Black, percent white, difference in proportion of BLM tweets and difference in}\) -->
 <!-- \(\hspace*{\fill} \footnotesize \text{proportion of pro-BLM tweets.}\) -->
 
-```{r}
-# pro-BLM network regression
+```{r, echo = FALSE}
+# pro-BLM network regression all states
+regression <- readRDS(here("final-paper/figures/pro_blm_net_reg.Rds"))
+tibble(Variable = c("Intercept", "pro-BLM", "Contiguity", "Black", "White", "Urban", "Income", "Ideology", "Population"), "Estimated Coefficient" = regression$coefficients, "Pr(<=b)" = regression$pleeq, "Pr(>=b)" = regression$pgreq, "Pr(>=|b|)" = regression$pgreqabs) |>
+  knitr::kable(caption = "Network regression of shared police reform policies on difference in proportion of pro-BLM tweets between governors, contiguity, difference in % Black population, difference in % white population, difference in state % urban, difference in median income, and difference in state ideology")
 ```
 
 None of our estimated coefficient values were significantly different from their predicted null hypothesis values in our police reform legislation-adoption network regression, and neither gender nor party were significant predictors in the model predicting BLM tweeting frequency. This is contrary to our original hypotheses, and pointed to a need for further analysis. We wondered, does tweeting about BLM and tweeting pro-BLM sentiments correlate with police reform policy adoption in a non-network context (monadic analysis)? How does this relationship change if we filter for states who passed at least one police reform law?
 
 ## Follow-up Hypotheses
 
-\(H_5: \text{Increased governor weeting about BLM will correlate with more police reform policies being passed in their state.}\)
+\(H_5: \text{Increased governor BLM and pro-BLM tweeting will correlate with more police reform policies} \\ \text{being passed in their state.}\)
 
-\(H_6: \text{Increased governor pro-BLM tweeting will correlate with more police reform policies being passed in their state.}\)
+\( \hspace{-.25in} H_6: \text{Increased governor BLM and pro-BLM tweeting will correlate with more police reform policies} \\ \text{being passed in their state when filtering for states with at least one bill passed.}\)
+
+\( \hspace{-.25in} H_7: \text{Increasingly similar governor BLM and pro-BLM tweeting will correlate with more similar police reform policies} \\ \text{being passed in their states when filtering for states with at least one shared police reform law.}\)
+
+
 
 ## Follow-up Results
 
-```{r}
+```{r, echo = FALSE}
 # coefficient table for BLM monadic regression
+blm_mon_all <- readRDS(here("final-paper/figures/blm_mon_reg_all.Rds"))
+# table
+tibble(Variable = c("Intercept", "BLM", "Urban", "White", "Black", "Income", "Population", "Ideology"), "Estimated Coefficient" = round(blm_mon_all$coefficients, 3), "Standard Error" = round(summary(blm_mon_all)$coefficients[,2], 3), "t-value" = round(summary(blm_mon_all)$coefficients[,3], 3), "Pr(>|t|)" = round(summary(blm_mon_all)$coefficients[,4], 3)) |>
+  knitr::kable(caption = "Monadic regression of police reform laws on proportion of BLM tweets, urban index, % white, % Black, median income, population size, and ideology score")
 ```
 
-```{r}
+```{r, echo = FALSE}
 # coefficient table for pro-BLM monadic regression
+pro_blm_mon_all <- readRDS(here("final-paper/figures/pro_blm_mon_reg_all.Rds"))
+# table
+tibble(Variable = c("Intercept", "pro-BLM", "Urban", "White", "Black", "Income", "Population", "Ideology"), "Estimated Coefficient" = round(pro_blm_mon_all$coefficients, 3), "Standard Error" = round(summary(pro_blm_mon_all)$coefficients[,2], 3), "t-value" = round(summary(pro_blm_mon_all)$coefficients[,3], 3), "Pr(>|t|)" = round(summary(pro_blm_mon_all)$coefficients[,4], 3)) |>
+  knitr::kable(caption = "Monadic regression of police reform laws on proportion of pro-BLM tweets, urban index, % white, % Black, median income, population size, and ideology score")
+```
+
+```{r, echo = FALSE}
+# coefficient table for BLM monadic regression, laws > 0
+blm_mon_nz <- readRDS(here("final-paper/figures/blm_mon_reg_nz.Rds"))
+# table
+tibble(Variable = c("Intercept", "BLM", "Urban", "White", "Black", "Income", "Population", "Ideology"), "Estimated Coefficient" = round(blm_mon_nz$coefficients, 3), "Standard Error" = round(summary(blm_mon_nz)$coefficients[,2], 3), "t-value" = round(summary(blm_mon_nz)$coefficients[,3], 3), "Pr(>|t|)" = round(summary(blm_mon_nz)$coefficients[,4], 3)) |>
+  knitr::kable(caption = "Monadic regression of police reform laws on proportion of BLM tweets, urban index, % white, % Black, median income, population size, and ideology score, filtered for states where laws passed > 0")
+```
+
+```{r, echo = FALSE}
+# coefficient table for pro-BLM monadic regression, laws > 0
+pro_blm_mon_nz <- readRDS(here("final-paper/figures/pro_blm_mon_reg_nz.Rds"))
+# table
+tibble(Variable = c("Intercept", "pro-BLM", "Urban", "White", "Black", "Income", "Population", "Ideology"), "Estimated Coefficient" = round(pro_blm_mon_all$coefficients, 3), "Standard Error" = round(summary(pro_blm_mon_nz)$coefficients[,2], 3), "t-value" = round(summary(pro_blm_mon_nz)$coefficients[,3], 3), "Pr(>|t|)" = round(summary(pro_blm_mon_nz)$coefficients[,4], 3)) |>
+  knitr::kable(caption = "Monadic regression of police reform laws on proportion of pro-BLM tweets, urban index, % white, % Black, median income, population size, and ideology score, filtered for states where laws passed > 0")
 ```
 
 
@@ -176,14 +237,26 @@ We retain the null in the cases of hypotheses 1,
 
 Interestingly, the 
 
-```{r}
+```{r, echo = FALSE}
 # BLM vs policy plot
+ggplot(state_info, aes(x = topic_blm_ratio, y = bill_score, color = state)) +
+  geom_point() +
+  theme_bw() +
+  labs(title = "Police reform laws passed vs BLM tweeting proportion by state",
+       x = "BLM tweeting proportion",
+       y = "Police reform laws passed")
 ```
 
 
 
-```{r}
+```{r, echo = FALSE}
 # pro-BLM vs policy plot
+ggplot(state_info, aes(x = pro_blm_ratio, y = bill_score, color = state)) +
+  geom_point() +
+  theme_bw() +
+  labs(title = "Police reform laws passed vs pro-BLM tweeting proportion by state",
+       x = "pro-BLM tweeting proportion",
+       y = "Police reform laws passed")
 ```
 
 # Limitations and Future Work

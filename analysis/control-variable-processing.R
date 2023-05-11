@@ -122,18 +122,28 @@ saveRDS(age_mat, here("data/gov_age_mat.Rds"))
 
 # Bills -------------------------------------------------------------------
 
-bill_edge <- import(here("data/bill_edgelist.Rds"))
+bill_edge <- import(here("data/full-edge-list.csv"))
 
 states_to_filter <- setdiff(unique(bill_edge$state), states)
 
 bill_edge_filtered <- bill_edge |>
-  filter(!(state %in% states_to_filter), !(state_j %in% states_to_filter))
+  filter(!(state %in% states_to_filter), !(state_j %in% states_to_filter)) |>
+  select(state, state_j, score)
 
-bill_graph = graph.data.frame(bill_edge_filtered)
-bill_adj = get.adjacency(bill_graph, sparse = TRUE, attr = "score")
-bill_mat <- as.matrix(bill_adj)
+bills <- graph.data.frame(bill_edge_filtered) |>
+        get.adjacency(sparse = TRUE, attr = "score") |>
+        as.matrix()
 
+bills_nz <- bill_edge_filtered |>
+  filter(score > 0) |>
+  graph.data.frame() |>
+  get.adjacency(sparse = TRUE, attr = "score") |>
+  as.matrix()
 
+zero_states <- bill_edge_filtered |>
+  filter(score == 0) |>
+  mutate(concat = paste0(state, state_j)) |>
+  pull(concat)
 
 # BLM Tweets --------------------------------------------------------------
 
@@ -161,10 +171,16 @@ edge_blm <- joined_blm |>
   mutate(prop_diff = abs(blm_prop - blm_prop_j)) |>
   select(state, state_j, prop_diff)
 
-blm_graph = graph.data.frame(edge_blm)
-blm_adj = get.adjacency(blm_graph, sparse = TRUE, attr = "prop_diff")
-blm_mat <- as.matrix(blm_adj)
+blm = graph.data.frame(edge_blm) |>
+              get.adjacency(sparse = TRUE, attr = "prop_diff") |>
+              as.matrix()
 
+blm_nz = edge_blm |>
+  mutate(concat = paste0(state, state_j)) |>
+  filter(!(concat %in% zero_states)) |>
+  graph.data.frame() |>
+  get.adjacency(sparse = TRUE, attr = "prop_diff") |>
+  as.matrix()
 
 # Pro-BLM Tweets ----------------------------------------------------------
 
@@ -190,54 +206,235 @@ edge_pro_blm <- joined_pro_blm |>
   mutate(prop_diff = abs(pro_blm_prop - pro_blm_prop_j)) |>
   select(state, state_j, prop_diff)
 
-pro_blm_graph = graph.data.frame(edge_pro_blm)
-pro_blm_adj = get.adjacency(pro_blm_graph, sparse = TRUE, attr = "prop_diff")
-pro_blm_mat <- as.matrix(pro_blm_adj)
+pro_blm <- graph.data.frame(edge_pro_blm) |>
+  get.adjacency(sparse = TRUE, attr = "prop_diff") |>
+  as.matrix()
 
-
+pro_blm_nz = edge_pro_blm |>
+  mutate(concat = paste0(state, state_j)) |>
+  filter(!(concat %in% zero_states)) |>
+  graph.data.frame() |>
+  get.adjacency(sparse = TRUE, attr = "prop_diff") |>
+  as.matrix()
 
 # Contiguity --------------------------------------------------------------
 
-state_traits <- import(here("raw-data/state-traits-edgelist.csv"))
+missing_states <- c("AR", "MS", "NV", "NY", "WV", "DC")
 
-contiguity <- import(here("raw-data/state-traits-edgelist.csv")) |>
-  select(state_01, state_02, contig)
+state_traits <- import(here("raw-data/state-traits-edgelist.csv")) |>
+  filter(!(state_01 %in% missing_states), !(state_02 %in% missing_states))
 
+contiguity <- state_traits |>
+  select(state_01, state_02, contig) |>
+  graph.data.frame() |>
+  get.adjacency(sparse = TRUE, attr = "contig") |>
+  as.matrix()
+
+contiguity_nz <- state_traits |>
+  select(state_01, state_02, contig) |>
+  mutate(concat = paste0(state_01, state_02)) |>
+  filter(!(concat %in% zero_states)) |>
+  graph.data.frame() |>
+  get.adjacency(sparse = TRUE, attr = "contig") |>
+  as.matrix()
 
 # Population --------------------------------------------------------------
 
+population <- state_traits |>
+  select(state_01, state_02, dif_population) |>
+  graph.data.frame() |>
+  get.adjacency(sparse = TRUE, attr = "dif_population") |>
+  as.matrix()
+
+population_nz <- state_traits |>
+  select(state_01, state_02, dif_population) |>
+  mutate(concat = paste0(state_01, state_02)) |>
+  filter(!(concat %in% zero_states)) |>
+  graph.data.frame() |>
+  get.adjacency(sparse = TRUE, attr = "dif_population") |>
+  as.matrix()
 
 
 # Proportion Black --------------------------------------------------------
 
+black <- state_traits |>
+  select(state_01, state_02, dif_Black) |>
+  graph.data.frame() |>
+  get.adjacency(sparse = TRUE, attr = "dif_Black") |>
+  as.matrix()
 
+black_nz <- state_traits |>
+  select(state_01, state_02, dif_Black) |>
+  mutate(concat = paste0(state_01, state_02)) |>
+  filter(!(concat %in% zero_states)) |>
+  graph.data.frame() |>
+  get.adjacency(sparse = TRUE, attr = "dif_Black") |>
+  as.matrix()
+
+# Ideology ----------------------------------------------------------------
+
+ideology <- state_traits |>
+  select(state_01, state_02, dif_mrp_ideology) |>
+  graph.data.frame() |>
+  get.adjacency(sparse = TRUE, attr = "dif_mrp_ideology") |>
+  as.matrix()
+
+ideology_nz <- state_traits |>
+  select(state_01, state_02, dif_mrp_ideology) |>
+  mutate(concat = paste0(state_01, state_02)) |>
+  filter(!(concat %in% zero_states)) |>
+  graph.data.frame() |>
+  get.adjacency(sparse = TRUE, attr = "dif_mrp_ideology") |>
+  as.matrix()
+
+# Income ------------------------------------------------------------------
+
+income <- state_traits |>
+  select(state_01, state_02, dif_med_inc) |>
+  graph.data.frame() |>
+  get.adjacency(sparse = TRUE, attr = "dif_med_inc") |>
+  as.matrix()
+
+income_nz <- state_traits |>
+  select(state_01, state_02, dif_med_inc) |>
+  mutate(concat = paste0(state_01, state_02)) |>
+  filter(!(concat %in% zero_states)) |>
+  graph.data.frame() |>
+  get.adjacency(sparse = TRUE, attr = "dif_med_inc") |>
+  as.matrix()
+
+# Urban -------------------------------------------------------------------
+
+urban <- state_traits |>
+  select(state_01, state_02, dif_urban_index) |>
+  graph.data.frame() |>
+  get.adjacency(sparse = TRUE, attr = "dif_urban_index") |>
+  as.matrix()
+
+urban_nz <- state_traits |>
+  select(state_01, state_02, dif_urban_index) |>
+  mutate(concat = paste0(state_01, state_02)) |>
+  filter(!(concat %in% zero_states)) |>
+  graph.data.frame() |>
+  get.adjacency(sparse = TRUE, attr = "dif_urban_index") |>
+  as.matrix()
 
 # Proportion White --------------------------------------------------------
 
+white <- state_traits |>
+  select(state_01, state_02, dif_White) |>
+  graph.data.frame() |>
+  get.adjacency(sparse = TRUE, attr = "dif_White") |>
+  as.matrix()
 
+white_nz <- state_traits |>
+  select(state_01, state_02, dif_White) |>
+  mutate(concat = paste0(state_01, state_02)) |>
+  filter(!(concat %in% zero_states)) |>
+  graph.data.frame() |>
+  get.adjacency(sparse = TRUE, attr = "dif_White") |>
+  as.matrix()
 
 # Modeling ----------------------------------------------------------------
 
-state_mats <- array(NA, c(5, length(bill_mat[1,]), length(bill_mat[1,])))
+# BLM net reg
 
-state_mats[1,,] <- gender_mat
-state_mats[2,,] <- party_mat
-state_mats[3,,] <- age_mat
-state_mats[4,,] <- blm_mat
-state_mats[5,,] <- pro_blm_mat
+state_mats <- array(NA, c(8, length(bills[1,]), length(bills[1,])))
+
+state_mats[1,,] <- blm
+state_mats[2,,] <- contiguity
+state_mats[3,,] <- black
+state_mats[4,,] <- white
+state_mats[5,,] <- urban
+state_mats[6,,] <- income
+state_mats[7,,] <- ideology
+state_mats[8,,] <- population
 
 set.seed(2023)
 
-latent_lm <- sna::netlm(bill_mat, state_mats, reps=100)
+latent_lm <- sna::netlm(bills, state_mats, reps=100)
 
 latent_model <- list()
 latent_model <- summary(latent_lm)
-latent_model$names <- c("Intercept", "Same Gender", "Same Party", "Age Difference", "BLM Tweet Prop Diff", "Pro-BLM Tweet Prop Diff")
+latent_model$names <- c("Intercept", "BLM", "Contiguity", "Black", "White", "Urban", "Income", "Ideology", "Population")
 
 latent_model
 
+saveRDS(latent_model, here("final-paper/figures/blm_net_reg.Rds"))
+
 #plot(latent_model$residuals, latent_model$fitted.values)
 
+# pro-BLM net reg
+
+state_mats <- array(NA, c(8, length(bills[1,]), length(bills[1,])))
+
+state_mats[1,,] <- pro_blm
+state_mats[2,,] <- contiguity
+state_mats[3,,] <- black
+state_mats[4,,] <- white
+state_mats[5,,] <- urban
+state_mats[6,,] <- income
+state_mats[7,,] <- ideology
+state_mats[8,,] <- population
+
+latent_lm <- sna::netlm(bills, state_mats, reps=100)
+
+latent_model <- list()
+latent_model <- summary(latent_lm)
+latent_model$names <- c("Intercept", "pro-BLM", "Contiguity", "Black", "White", "Urban", "Income", "Ideology", "Population")
+latent_model
+
+saveRDS(latent_model, here("final-paper/figures/pro_blm_net_reg.Rds"))
+
+
+# Modeling no zero bills --------------------------------------------------
+
+# BLM net reg
+
+state_mats <- array(NA, c(8, length(bills_nz[1,]), length(bills_nz[1,])))
+
+state_mats[1,,] <- blm_nz
+state_mats[2,,] <- contiguity_nz
+state_mats[3,,] <- black_nz
+state_mats[4,,] <- white_nz
+state_mats[5,,] <- urban_nz
+state_mats[6,,] <- income_nz
+state_mats[7,,] <- ideology_nz
+state_mats[8,,] <- population_nz
+
+latent_lm <- sna::netlm(bills_nz, state_mats, reps=100)
+
+latent_model <- list()
+latent_model <- summary(latent_lm)
+latent_model$names <- c("Intercept", "BLM", "Contiguity", "Black", "White", "Urban", "Income", "Ideology", "Population")
+
+latent_model
+
+saveRDS(latent_model, here("final-paper/figures/blm_net_reg_nz.Rds"))
+
+#plot(latent_model$residuals, latent_model$fitted.values)
+
+# pro-BLM net reg
+
+state_mats <- array(NA, c(8, length(bills_nz[1,]), length(bills_nz[1,])))
+
+state_mats[1,,] <- pro_blm_nz
+state_mats[2,,] <- contiguity_nz
+state_mats[3,,] <- black_nz
+state_mats[4,,] <- white_nz
+state_mats[5,,] <- urban_nz
+state_mats[6,,] <- income_nz
+state_mats[7,,] <- ideology_nz
+state_mats[8,,] <- population_nz
+
+latent_lm <- sna::netlm(bills_nz, state_mats, reps=100)
+
+latent_model <- list()
+latent_model <- summary(latent_lm)
+latent_model$names <- c("Intercept", "pro-BLM", "Contiguity", "Black", "White", "Urban", "Income", "Ideology", "Population")
+latent_model
+
+saveRDS(latent_model, here("final-paper/figures/pro_blm_net_reg_nz.Rds"))
 
 # Governor Regression -----------------------------------------------------
 
@@ -254,5 +451,5 @@ summary(pro_governor_mod)
 plot(governor_mod)
 
 saveRDS(governor_mod, here("data/governor_mod.Rds"))
-
+saveRDS(pro_governor_mod, here("final-paper/figures/pro_governor_mod.Rds"))
 

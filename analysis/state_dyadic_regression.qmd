@@ -66,7 +66,8 @@ full_edge_list <- merged_edge_list %>%
   mutate(dif_ratio = abs(topic_blm_ratio_x - topic_blm_ratio_y),
          dif_pro_ratio = abs(pro_blm_ratio_x - pro_blm_ratio_y)) |>
   filter(!(state %in% missing_states)) %>% 
-  filter(!(state_j %in% missing_states))
+  filter(!(state_j %in% missing_states)) |>
+  filter(state_i)
 
 #write.csv(full_edge_list, "data/full-edge-list.csv")
 
@@ -76,7 +77,7 @@ states <- full_edge_list %>%
 
 ```
 
-Remove states w no bills 
+Remove states w no bills
 
 Create igraph network
 
@@ -91,8 +92,8 @@ similarity <- as_adjacency_matrix(igraph, attr="score")
 similarity <- as.matrix(similarity)
 
 #IVs
-twitter <- as_adjacency_matrix(igraph, attr="dif_ratio")
-twitter <- as.matrix(twitter)
+BLM <- as_adjacency_matrix(igraph, attr="dif_ratio")
+BLM <- as.matrix(twitter)
 contiguity <- as_adjacency_matrix(igraph, attr="contig")
 contiguity <- as.matrix(contiguity)
 ideology <- as_adjacency_matrix(igraph, attr="dif_mrp_ideology")
@@ -122,7 +123,7 @@ state_matrices[1,,] <- contiguity
 state_matrices[2,,] <- ideology
 state_matrices[3,,] <- white
 state_matrices[4,,] <- black
-state_matrices[5,,] <- twitter
+state_matrices[5,,] <- BLM
 state_matrices[6,,] <- urban
 state_matrices[7,,] <- income
 # state_matrices[8,,] <- gov_gender
@@ -153,7 +154,6 @@ state_model
 #         list(contiguity, ideology, white, black), # List the independent variables/networks
 #          reps=1000) 
 ```
-
 
 ```{r}
 

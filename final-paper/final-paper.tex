@@ -22,47 +22,6 @@
 %% load any required packages here
 
 
-% Pandoc syntax highlighting
-\usepackage{color}
-\usepackage{fancyvrb}
-\newcommand{\VerbBar}{|}
-\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
-\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
-% Add ',fontsize=\small' for more characters per line
-\usepackage{framed}
-\definecolor{shadecolor}{RGB}{248,248,248}
-\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
-\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
-\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
-\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
-\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
-\newcommand{\BuiltInTok}[1]{#1}
-\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
-\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
-\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
-\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
-\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
-\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
-\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
-\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
-\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
-\newcommand{\ExtensionTok}[1]{#1}
-\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
-\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
-\newcommand{\ImportTok}[1]{#1}
-\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
-\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
-\newcommand{\NormalTok}[1]{#1}
-\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
-\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
-\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
-\newcommand{\RegionMarkerTok}[1]{#1}
-\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
-\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
-\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
-\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
-\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
-\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
 
 % tightlist command for lists without linebreak
 \providecommand{\tightlist}{%
@@ -128,7 +87,8 @@ movements, and citizens. Politicians often use twitter to communicate
 with the public, campaign, advocate for themselves and their policies,
 and send out calls to action. Twitter has also provided a convenient and
 public way for the public and organizations to call on elected officials
-to take action on relevant issues facing the public. We employed
+to take action on relevant issues facing the public. We find that when
+treated as a network object
 \end{abstract}
 
 \noindent%
@@ -480,20 +440,22 @@ police reform bills network on. The Quadratic Assignment Procedure (QAP)
 permutation test, using Dekker's ``semi-partialling plus'' procedure was
 used, as it is recommended for multivariate analyses.
 
+Because BLM and pro-BLM tweeting proportions are correlated {[}SEE
+FIGURE BLANK{]}, we ran models with either one or the other, but not
+both.
+
+\begin{figure}
+\centering
+\includegraphics{final-paper_files/figure-latex/unnamed-chunk-2-1.pdf}
+\caption{Plot of predicted BLM vs pro-BLM tweets per governor}
+\end{figure}
+
 \hypertarget{results}{%
 \section{Results}\label{results}}
 
-\begin{center}
-
-  \includegraphics[width=150mm,scale=0.5]{"/Users/michelesezgin/Desktop/Classes/SDS-338/final-project/final-paper/figures/BC-state-policy.png"}
-  
-\end{center}
-
-\(\hspace*{\fill} \footnotesize \text{Figure 1. Brennan Center for Justice police reform policy adoption map}\)
-
 The top five states that adopted the most police reform laws from May
 25, 2020-May 21, 2021 were Illinois, Washington, Colorado,
-Massachusetts, and Virginia.\textbackslash{}
+Massachusetts, and Virginia.
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1467}}
@@ -501,6 +463,22 @@ Massachusetts, and Virginia.\textbackslash{}
   >{\raggedleft\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}
   >{\raggedleft\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1067}}
   >{\raggedleft\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2533}}@{}}
+\caption{Regression of BLM tweeting proportion on governor gender and
+party}\tabularnewline
+\toprule()
+\begin{minipage}[b]{\linewidth}\raggedright
+Variable
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Estimated Coefficient
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Standard Error
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+t-value
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Pr(\textgreater\textbar t\textbar)
+\end{minipage} \\
+\midrule()
+\endfirsthead
 \toprule()
 \begin{minipage}[b]{\linewidth}\raggedright
 Variable
@@ -521,7 +499,47 @@ Republican & -0.015 & 0.015 & -0.951 & 0.347 \\
 \bottomrule()
 \end{longtable}
 
-\(\hspace*{\fill} \footnotesize \text{Figure 2. Regression of BLM tweeting proportion on governor gender and party}\)
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1467}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2933}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1067}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2533}}@{}}
+\caption{Regression of pro-BLM tweeting proportion on governor gender
+and party}\tabularnewline
+\toprule()
+\begin{minipage}[b]{\linewidth}\raggedright
+Variable
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Estimated Coefficient
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Standard Error
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+t-value
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Pr(\textgreater\textbar t\textbar)
+\end{minipage} \\
+\midrule()
+\endfirsthead
+\toprule()
+\begin{minipage}[b]{\linewidth}\raggedright
+Variable
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Estimated Coefficient
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Standard Error
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+t-value
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Pr(\textgreater\textbar t\textbar)
+\end{minipage} \\
+\midrule()
+\endhead
+Intercept & 0.007 & 0.003 & 2.106 & 0.041 \\
+Male & 0.002 & 0.004 & 0.569 & 0.572 \\
+Republican & -0.003 & 0.003 & -0.981 & 0.332 \\
+\bottomrule()
+\end{longtable}
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1594}}
@@ -529,6 +547,25 @@ Republican & -0.015 & 0.015 & -0.951 & 0.347 \\
   >{\raggedleft\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1159}}
   >{\raggedleft\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1159}}
   >{\raggedleft\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2899}}@{}}
+\caption{Network regression of shared police reform policies on
+difference in proportion of BLM tweets between governors, contiguity,
+difference in \% Black population, difference in \% white population,
+difference in state \% urban, difference in median income, and
+difference in state ideology}\tabularnewline
+\toprule()
+\begin{minipage}[b]{\linewidth}\raggedright
+Variable
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Estimated Coefficient
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Pr(\textless=b)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Pr(\textgreater=b)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Pr(\textgreater=\textbar b\textbar)
+\end{minipage} \\
+\midrule()
+\endfirsthead
 \toprule()
 \begin{minipage}[b]{\linewidth}\raggedright
 Variable
@@ -543,25 +580,74 @@ Pr(\textgreater=\textbar b\textbar)
 \end{minipage} \\
 \midrule()
 \endhead
-Intercept & 1.47 & 0.999 & 0.001 & 0.001 \\
-Contiguity & -0.06 & 0.336 & 0.664 & 0.676 \\
-Ideology & -1.01 & 0.044 & 0.956 & 0.103 \\
-White & -0.02 & 0.584 & 0.416 & 0.988 \\
-Black & -1.05 & 0.197 & 0.803 & 0.409 \\
-BLM & -0.87 & 0.474 & 0.526 & 0.755 \\
-Pro-BLM & 1.05 & 0.546 & 0.454 & 0.937 \\
+Intercept & 0.9582214 & 1.00 & 0.00 & 0.00 \\
+BLM & -0.8957513 & 0.41 & 0.59 & 0.60 \\
+Contiguity & 0.1317323 & 0.81 & 0.19 & 0.34 \\
+Black & -1.1746500 & 0.15 & 0.85 & 0.28 \\
+White & -0.9403489 & 0.08 & 0.92 & 0.25 \\
+Urban & -0.1329542 & 0.10 & 0.90 & 0.22 \\
+Income & 0.0000018 & 0.75 & 0.25 & 0.84 \\
+Ideology & -1.0208221 & 0.02 & 0.98 & 0.06 \\
+Population & 0.0000000 & 0.69 & 0.31 & 0.69 \\
 \bottomrule()
 \end{longtable}
 
-\(\hspace*{\fill} \footnotesize \text{Figure 3. Network regression of shared police reform policy on state contiguity, difference in state}\)
-\(\hspace*{\fill} \footnotesize \text{ideology, percent Black, percent white, difference in proportion of BLM tweets and difference in}\)
-\(\hspace*{\fill} \footnotesize \text{proportion of pro-BLM tweets.}\)
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1594}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.3188}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1159}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1159}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2899}}@{}}
+\caption{Network regression of shared police reform policies on
+difference in proportion of pro-BLM tweets between governors,
+contiguity, difference in \% Black population, difference in \% white
+population, difference in state \% urban, difference in median income,
+and difference in state ideology}\tabularnewline
+\toprule()
+\begin{minipage}[b]{\linewidth}\raggedright
+Variable
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Estimated Coefficient
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Pr(\textless=b)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Pr(\textgreater=b)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Pr(\textgreater=\textbar b\textbar)
+\end{minipage} \\
+\midrule()
+\endfirsthead
+\toprule()
+\begin{minipage}[b]{\linewidth}\raggedright
+Variable
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Estimated Coefficient
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Pr(\textless=b)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Pr(\textgreater=b)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Pr(\textgreater=\textbar b\textbar)
+\end{minipage} \\
+\midrule()
+\endhead
+Intercept & 0.9131001 & 1.00 & 0.00 & 0.00 \\
+pro-BLM & 0.3992253 & 0.56 & 0.44 & 0.96 \\
+Contiguity & 0.1383964 & 0.86 & 0.14 & 0.32 \\
+Black & -1.0930636 & 0.15 & 0.85 & 0.33 \\
+White & -0.9175984 & 0.11 & 0.89 & 0.24 \\
+Urban & -0.1252649 & 0.20 & 0.80 & 0.33 \\
+Income & 0.0000013 & 0.55 & 0.45 & 0.89 \\
+Ideology & -1.0799296 & 0.04 & 0.96 & 0.12 \\
+Population & 0.0000000 & 0.66 & 0.34 & 0.74 \\
+\bottomrule()
+\end{longtable}
 
 None of our estimated coefficient values were significantly different
 from their predicted null hypothesis values in our police reform
 legislation-adoption network regression, and neither gender nor party
 were significant predictors in the model predicting BLM tweeting
-frequency. This is contrary to our original hypotheses, and points to a
+frequency. This is contrary to our original hypotheses, and pointed to a
 need for further analysis. We wondered, does tweeting about BLM and
 tweeting pro-BLM sentiments correlate with police reform policy adoption
 in a non-network context (monadic analysis)? How does this relationship
@@ -570,6 +656,209 @@ law?
 
 \hypertarget{follow-up-hypotheses}{%
 \subsection{Follow-up Hypotheses}\label{follow-up-hypotheses}}
+
+\(H_5: \text{Increased governor BLM and pro-BLM tweeting will correlate with more police reform policies} \\ \text{being passed in their state.}\)
+
+\(\hspace{-.25in} H_6: \text{Increased governor BLM and pro-BLM tweeting will correlate with more police reform policies} \\ \text{being passed in their state when filtering for states with at least one bill passed.}\)
+
+\(\hspace{-.25in} H_7: \text{Increasingly similar governor BLM and pro-BLM tweeting will correlate with more similar police reform policies} \\ \text{being passed in their states when filtering for states with at least one shared police reform law.}\)
+
+\hypertarget{follow-up-results}{%
+\subsection{Follow-up Results}\label{follow-up-results}}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1467}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2933}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1067}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2533}}@{}}
+\caption{Monadic regression of police reform laws on proportion of BLM
+tweets, urban index, \% white, \% Black, median income, population size,
+and ideology score}\tabularnewline
+\toprule()
+\begin{minipage}[b]{\linewidth}\raggedright
+Variable
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Estimated Coefficient
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Standard Error
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+t-value
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Pr(\textgreater\textbar t\textbar)
+\end{minipage} \\
+\midrule()
+\endfirsthead
+\toprule()
+\begin{minipage}[b]{\linewidth}\raggedright
+Variable
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Estimated Coefficient
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Standard Error
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+t-value
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Pr(\textgreater\textbar t\textbar)
+\end{minipage} \\
+\midrule()
+\endhead
+Intercept & -10.200 & 8.189 & -1.246 & 0.221 \\
+BLM & -11.052 & 8.106 & -1.364 & 0.181 \\
+Urban & 0.065 & 0.752 & 0.086 & 0.932 \\
+White & 6.514 & 3.879 & 1.679 & 0.102 \\
+Black & 3.443 & 5.652 & 0.609 & 0.546 \\
+Income & 0.000 & 0.000 & 2.093 & 0.043 \\
+Population & 0.000 & 0.000 & -0.364 & 0.718 \\
+Ideology & -9.367 & 3.898 & -2.403 & 0.021 \\
+\bottomrule()
+\end{longtable}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1467}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2933}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1067}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2533}}@{}}
+\caption{Monadic regression of police reform laws on proportion of
+pro-BLM tweets, urban index, \% white, \% Black, median income,
+population size, and ideology score}\tabularnewline
+\toprule()
+\begin{minipage}[b]{\linewidth}\raggedright
+Variable
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Estimated Coefficient
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Standard Error
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+t-value
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Pr(\textgreater\textbar t\textbar)
+\end{minipage} \\
+\midrule()
+\endfirsthead
+\toprule()
+\begin{minipage}[b]{\linewidth}\raggedright
+Variable
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Estimated Coefficient
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Standard Error
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+t-value
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Pr(\textgreater\textbar t\textbar)
+\end{minipage} \\
+\midrule()
+\endhead
+Intercept & -7.597 & 8.122 & -0.935 & 0.356 \\
+pro-BLM & 33.781 & 45.177 & 0.748 & 0.459 \\
+Urban & -0.085 & 0.754 & -0.112 & 0.911 \\
+White & 4.893 & 3.966 & 1.234 & 0.225 \\
+Black & 3.593 & 5.748 & 0.625 & 0.536 \\
+Income & 0.000 & 0.000 & 1.908 & 0.064 \\
+Population & 0.000 & 0.000 & -0.569 & 0.573 \\
+Ideology & -9.005 & 3.980 & -2.262 & 0.030 \\
+\bottomrule()
+\end{longtable}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1467}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2933}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1067}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2533}}@{}}
+\caption{Monadic regression of police reform laws on proportion of BLM
+tweets, urban index, \% white, \% Black, median income, population size,
+and ideology score, filtered for states where laws passed \textgreater{}
+0}\tabularnewline
+\toprule()
+\begin{minipage}[b]{\linewidth}\raggedright
+Variable
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Estimated Coefficient
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Standard Error
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+t-value
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Pr(\textgreater\textbar t\textbar)
+\end{minipage} \\
+\midrule()
+\endfirsthead
+\toprule()
+\begin{minipage}[b]{\linewidth}\raggedright
+Variable
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Estimated Coefficient
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Standard Error
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+t-value
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Pr(\textgreater\textbar t\textbar)
+\end{minipage} \\
+\midrule()
+\endhead
+Intercept & -10.417 & 12.136 & -0.858 & 0.405 \\
+BLM & 45.075 & 24.268 & 1.857 & 0.084 \\
+Urban & 0.479 & 1.183 & 0.405 & 0.692 \\
+White & 6.569 & 5.043 & 1.303 & 0.214 \\
+Black & 3.013 & 7.628 & 0.395 & 0.699 \\
+Income & 0.000 & 0.000 & 0.488 & 0.633 \\
+Population & 0.000 & 0.000 & -0.666 & 0.516 \\
+Ideology & -8.346 & 5.524 & -1.511 & 0.153 \\
+\bottomrule()
+\end{longtable}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1467}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2933}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1067}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2533}}@{}}
+\caption{Monadic regression of police reform laws on proportion of
+pro-BLM tweets, urban index, \% white, \% Black, median income,
+population size, and ideology score, filtered for states where laws
+passed \textgreater{} 0}\tabularnewline
+\toprule()
+\begin{minipage}[b]{\linewidth}\raggedright
+Variable
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Estimated Coefficient
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Standard Error
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+t-value
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Pr(\textgreater\textbar t\textbar)
+\end{minipage} \\
+\midrule()
+\endfirsthead
+\toprule()
+\begin{minipage}[b]{\linewidth}\raggedright
+Variable
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Estimated Coefficient
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Standard Error
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+t-value
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Pr(\textgreater\textbar t\textbar)
+\end{minipage} \\
+\midrule()
+\endhead
+Intercept & -7.597 & 10.249 & -1.703 & 0.111 \\
+pro-BLM & 33.781 & 76.245 & 2.991 & 0.010 \\
+Urban & -0.085 & 1.033 & 1.208 & 0.247 \\
+White & 4.893 & 4.274 & 1.508 & 0.154 \\
+Black & 3.593 & 6.669 & 0.234 & 0.818 \\
+Income & 0.000 & 0.000 & 0.573 & 0.576 \\
+Population & 0.000 & 0.000 & -1.444 & 0.171 \\
+Ideology & -9.005 & 5.034 & -0.881 & 0.393 \\
+\bottomrule()
+\end{longtable}
 
 \hypertarget{discussion}{%
 \section{Discussion}\label{discussion}}
@@ -586,17 +875,9 @@ We retain the null in the cases of hypotheses 1,
 
 Interestingly, the
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\CommentTok{\# BLM vs policy plot}
-\end{Highlighting}
-\end{Shaded}
+\includegraphics{final-paper_files/figure-latex/unnamed-chunk-12-1.pdf}
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\CommentTok{\# pro{-}BLM vs policy plot}
-\end{Highlighting}
-\end{Shaded}
+\includegraphics{final-paper_files/figure-latex/unnamed-chunk-13-1.pdf}
 
 \hypertarget{limitations-and-future-work}{%
 \section{Limitations and Future
