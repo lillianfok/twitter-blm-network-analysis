@@ -386,55 +386,55 @@ latent_model
 
 saveRDS(latent_model, here("final-paper/figures/pro_blm_net_reg.Rds"))
 
-
-# Modeling no zero bills --------------------------------------------------
-
-# BLM net reg
-
-state_mats <- array(NA, c(8, length(bills_nz[1,]), length(bills_nz[1,])))
-
-state_mats[1,,] <- blm_nz
-state_mats[2,,] <- contiguity_nz
-state_mats[3,,] <- black_nz
-state_mats[4,,] <- white_nz
-state_mats[5,,] <- urban_nz
-state_mats[6,,] <- income_nz
-state_mats[7,,] <- ideology_nz
-state_mats[8,,] <- population_nz
-
-latent_lm <- sna::netlm(bills_nz, state_mats, reps=100)
-
-latent_model <- list()
-latent_model <- summary(latent_lm)
-latent_model$names <- c("Intercept", "BLM", "Contiguity", "Black", "White", "Urban", "Income", "Ideology", "Population")
-
-latent_model
-
-saveRDS(latent_model, here("final-paper/figures/blm_net_reg_nz.Rds"))
-
-#plot(latent_model$residuals, latent_model$fitted.values)
-
-# pro-BLM net reg
-
-state_mats <- array(NA, c(8, length(bills_nz[1,]), length(bills_nz[1,])))
-
-state_mats[1,,] <- pro_blm_nz
-state_mats[2,,] <- contiguity_nz
-state_mats[3,,] <- black_nz
-state_mats[4,,] <- white_nz
-state_mats[5,,] <- urban_nz
-state_mats[6,,] <- income_nz
-state_mats[7,,] <- ideology_nz
-state_mats[8,,] <- population_nz
-
-latent_lm <- sna::netlm(bills_nz, state_mats, reps=100)
-
-latent_model <- list()
-latent_model <- summary(latent_lm)
-latent_model$names <- c("Intercept", "pro-BLM", "Contiguity", "Black", "White", "Urban", "Income", "Ideology", "Population")
-latent_model
-
-saveRDS(latent_model, here("final-paper/figures/pro_blm_net_reg_nz.Rds"))
+# 
+# # Modeling no zero bills --------------------------------------------------
+# 
+# # BLM net reg
+# 
+# state_mats <- array(NA, c(8, length(bills_nz[1,]), length(bills_nz[1,])))
+# 
+# state_mats[1,,] <- blm_nz
+# state_mats[2,,] <- contiguity_nz
+# state_mats[3,,] <- black_nz
+# state_mats[4,,] <- white_nz
+# state_mats[5,,] <- urban_nz
+# state_mats[6,,] <- income_nz
+# state_mats[7,,] <- ideology_nz
+# state_mats[8,,] <- population_nz
+# 
+# latent_lm <- sna::netlm(bills_nz, state_mats, reps=100)
+# 
+# latent_model <- list()
+# latent_model <- summary(latent_lm)
+# latent_model$names <- c("Intercept", "BLM", "Contiguity", "Black", "White", "Urban", "Income", "Ideology", "Population")
+# 
+# latent_model
+# 
+# saveRDS(latent_model, here("final-paper/figures/blm_net_reg_nz.Rds"))
+# 
+# #plot(latent_model$residuals, latent_model$fitted.values)
+# 
+# # pro-BLM net reg
+# 
+# state_mats <- array(NA, c(8, length(bills_nz[1,]), length(bills_nz[1,])))
+# 
+# state_mats[1,,] <- pro_blm_nz
+# state_mats[2,,] <- contiguity_nz
+# state_mats[3,,] <- black_nz
+# state_mats[4,,] <- white_nz
+# state_mats[5,,] <- urban_nz
+# state_mats[6,,] <- income_nz
+# state_mats[7,,] <- ideology_nz
+# state_mats[8,,] <- population_nz
+# 
+# latent_lm <- sna::netlm(bills_nz, state_mats, reps=100)
+# 
+# latent_model <- list()
+# latent_model <- summary(latent_lm)
+# latent_model$names <- c("Intercept", "pro-BLM", "Contiguity", "Black", "White", "Urban", "Income", "Ideology", "Population")
+# latent_model
+# 
+# saveRDS(latent_model, here("final-paper/figures/pro_blm_net_reg_nz.Rds"))
 
 # Governor Regression -----------------------------------------------------
 

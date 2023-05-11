@@ -18,7 +18,7 @@ keywords:
 - Social network analysis
 
 abstract: |
-  We investigate whether state governors twitter habits regarding the Black Lives Matter movement correlates with passage of police reform laws in the state policy adoption network. Twitter has become an increasingly used social networking resource for politicians, social movements, and citizens. Politicians often use twitter to communicate with the public, campaign, advocate for themselves and their policies, and send out calls to action. Twitter has also provided a convenient and public way for the public and organizations to call on elected officials to take action on relevant issues facing the public. We find that when treated as a network object
+  We investigate whether state governors twitter habits regarding the Black Lives Matter (BLM) movement correlates with passage of police reform laws in the state policy adoption network. Politicians have been increasingly using Twitter to communicate their stances on important issues such as the BLM movement, but little work has been done to investigate whether they follow up on these stances with legislative action. Tweets were classified as either related to BLM and/or pro-BLM or not using gradient-boosted trees. By investigating the passage of police reform laws from May 2020-May 2021, we find no significant impact of BLM and/or pro-BLM tweeting rates when treating states/governors as a network or as independent observations. Future research should focus on refining tweet topic classification and broadening the scope of tweet/legislation topics studied.
 
 bibliography: bibliography.bib
 nocite: '@*'
@@ -28,7 +28,9 @@ output: rticles::asa_article
 
 # Introduction
 
-\(\hspace{.5cm}\) Twitter users often observe elected officials communicating their stance on political issues or making promises of policy change via Twitter. Politicians and their teams invest significant effort into curating a tweets and communicating with the public via online social networking sites. When evaluating the political performance of politicians, we expect that they "practice what they preach" and at least make good-faith attempts to pass legislation regarding issues they have publicly tweeted their support for. However, it is difficult to know whether tweeting about an issue predicts passage of legislation without actively seeking out this information. In the context of the Black Lives Matter movement, politicians were facing unprecedented societal pressure to crack down on police violence and enact substantial police reform laws. Though a controversial issue that saw many bills die in committee in Congress CITE, the states had more power to pass police reform legislation if pursued. This provides the motivation of our work investigating whether tweeting similarly and at all about the Black Lives Matter movement correlates with similar police reform policy adoption.
+\(\hspace{.5cm}\) Twitter users often observe elected officials communicating their stance on political issues or making promises of policy change via Twitter. Politicians and their teams invest significant effort into curating a tweets and communicating with the public via online social networking sites. When evaluating the political performance of politicians, we expect that they "practice what they preach" and at least make good-faith attempts to pass legislation regarding issues they have publicly tweeted their support for. However, it is difficult to know whether tweeting about an issue predicts passage of legislation without actively seeking out this information. In the context of the Black Lives Matter movement, politicians were facing unprecedented societal pressure to crack down on police violence and enact substantial police reform laws. Though a controversial issue that saw many bills die in committee in Congress, the states had more power to pass police reform legislation if pursued. This provides the motivation of our work investigating whether tweeting similarly and at all about the Black Lives Matter movement correlates with similar police reform policy adoption.
+
+We employed a gradient-boosted tree topic-classification algorithm to classify tweets as either BLM and/or pro-BLM or not. We then employed network regression models regressing state shared police reform bills on difference in proportion of BLM and pro-BLM tweets, contiguity, difference in % Black population, difference in % white population, difference in state % urban, difference in median income, and difference in state ideology. We find no significant relationships between number of shared bills and any of the predictors included. This prompted further monadic analyses regressing number of police reform laws passed on BLM and pro-BLM tweeting proportion, urban index, % white, % Black, median income, population size, and ideology score for all states and only states that passed at least one police reform law. We find significant relationships between BLM tweeting and police reform law passage only when filtering for states that passed at least one bill, pointing to the need for further study and inclusion of police reform bills passed outside the studied window.
 
 # Literature Review
 
@@ -139,10 +141,6 @@ full_lab_tweets |>
 
 # Results
 
-```{r, echo = FALSE}
-
-```
-
 The top five states that adopted the most police reform laws from May 25, 2020-May 21, 2021 were Illinois, Washington, Colorado, Massachusetts, and Virginia.
 
 ```{r, echo = FALSE}
@@ -182,17 +180,13 @@ tibble(Variable = c("Intercept", "pro-BLM", "Contiguity", "Black", "White", "Urb
   knitr::kable(caption = "Network regression of shared police reform policies on difference in proportion of pro-BLM tweets between governors, contiguity, difference in % Black population, difference in % white population, difference in state % urban, difference in median income, and difference in state ideology")
 ```
 
-None of our estimated coefficient values were significantly different from their predicted null hypothesis values in our police reform legislation-adoption network regression, and neither gender nor party were significant predictors in the model predicting BLM tweeting frequency. This is contrary to our original hypotheses, and pointed to a need for further analysis. We wondered, does tweeting about BLM and tweeting pro-BLM sentiments correlate with police reform policy adoption in a non-network context (monadic analysis)? How does this relationship change if we filter for states who passed at least one police reform law?
+None of our estimated coefficient values were significantly different from their predicted null hypothesis values in our police reform legislation-adoption network regressions, and neither gender nor party were significant predictors in the model predicting BLM and pro-BLM tweeting frequency. This is contrary to our original hypotheses, and pointed to a need for further analysis. We wondered, does tweeting about BLM and tweeting pro-BLM sentiments correlate with police reform policy adoption in a non-network context (monadic analysis)? How does this relationship change if we filter for states who passed at least one police reform law? We filter for states that passed at least one law because we know these states had some gap in their policing legislation that needed to be filled, whereas we did not know whether states that didn't pass any reform laws in the period studied had already passed police reform laws prior.
 
 ## Follow-up Hypotheses
 
 \(H_5: \text{Increased governor BLM and pro-BLM tweeting will correlate with more police reform policies} \\ \text{being passed in their state.}\)
 
 \( \hspace{-.25in} H_6: \text{Increased governor BLM and pro-BLM tweeting will correlate with more police reform policies} \\ \text{being passed in their state when filtering for states with at least one bill passed.}\)
-
-\( \hspace{-.25in} H_7: \text{Increasingly similar governor BLM and pro-BLM tweeting will correlate with more similar police reform policies} \\ \text{being passed in their states when filtering for states with at least one shared police reform law.}\)
-
-
 
 ## Follow-up Results
 
@@ -228,35 +222,39 @@ tibble(Variable = c("Intercept", "pro-BLM", "Urban", "White", "Black", "Income",
   knitr::kable(caption = "Monadic regression of police reform laws on proportion of pro-BLM tweets, urban index, % white, % Black, median income, population size, and ideology score, filtered for states where laws passed > 0")
 ```
 
-
 # Discussion
 
-None of our estimated coefficient values were significantly different from their predicted null hypothesis values in our police reform legislation-adoption network regression, and neither gender nor party were significant predictors in the model predicting BLM tweeting frequency. This is contrary to our original hypotheses, and points to a need for further analysis. Unfortunately, the anti-BLM classification model was not accurate enough to include it in our analysis.
+Interestingly, once we stop treating our data as a network object, more significant relationships emerge. BLM and pro-BLM become significant at the 10% level only when filtering for states who passed at least one police reform law. Is this because the states we excluded passed police reform legislation outside the specified window or were those excluded states contributing valuable and accurate information to our model?
 
-We retain the null in the cases of hypotheses 1, 
+Our network regression models both explain ~5% of the variation in shared police reform laws when accounting for difference in proportion of BLM and pro-BLM tweets and relevant control variables.
+This is 35% and 32% for monadic regression models with BLM and pro-BLM, respectively.
 
-Interestingly, the 
+Among states who passed police reform legislation, every 1% increase in proportion of BLM tweets is expected to result in a 0.45 increase in bills passed on average when controlling for urban index, % white, % Black, median income, population size, and ideology score. Similarly among states who passed police reform legislation, every 1% increase in proportion of pro-BLM tweets is expected to result in a 0.34 increase in bills passed on average when controlling for urban index, % white, % Black, median income, population size, and ideology score.
 
-```{r, echo = FALSE}
+Looking at Figure 2, we can see that by filtering for states that passed at least one police reform policy (i.e. removing the 5 dots on the y-intercept), a clearer relationship between BLM tweeting proportion and police reform laws passed starts to emerge. However, we would like to restate that we are unsure if these observations are adding signal or noise to our data set. In Figure 3, removing the observations where no bills were passed has a less clear effect on the relationship between pro-BLM tweeting proportion and polcie reform laws passed.
+
+```{r, echo = FALSE, fig.cap = "Plot of proportion of BLM tweets vs police reform laws passed by state"}
 # BLM vs policy plot
 ggplot(state_info, aes(x = topic_blm_ratio, y = bill_score, color = state)) +
   geom_point() +
   theme_bw() +
   labs(title = "Police reform laws passed vs BLM tweeting proportion by state",
        x = "BLM tweeting proportion",
-       y = "Police reform laws passed")
+       y = "Police reform laws passed",
+       color = "State")
 ```
 
 
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, fig.cap = "Plot of proportion of pro-BLM tweets vs police reform laws passed by state"}
 # pro-BLM vs policy plot
 ggplot(state_info, aes(x = pro_blm_ratio, y = bill_score, color = state)) +
   geom_point() +
   theme_bw() +
   labs(title = "Police reform laws passed vs pro-BLM tweeting proportion by state",
        x = "pro-BLM tweeting proportion",
-       y = "Police reform laws passed")
+       y = "Police reform laws passed",
+       color = "State")
 ```
 
 # Limitations and Future Work
