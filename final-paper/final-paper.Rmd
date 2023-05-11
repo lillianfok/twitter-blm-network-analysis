@@ -1,5 +1,5 @@
 ---
-title: "Tweet It LikeYou Mean It: Relationships Between Police Reform Legislation and Governor Twitter Behavior"
+title: "Tweet It Like You Mean It: Relationships Between Police Reform Legislation and Governor Twitter Behavior"
 
 # to produce blinded version set to 1
 blinded: 0
@@ -82,14 +82,15 @@ off_topic <- c('COVID', 'virus', 'social distanc', 'nurse','hospital', 'health',
 
 These were then sub-categorized as aligned with or against the broad demands of the Black Lives Matter movement. Pro- tweets encompassed those sympathetic to George Floyd, Breonna Taylor, and other victims of police brutality; messaging regarding police reforms or defunding; anti-racist and pro-equality statements. Anti- tweets decried the need for mass protest and civil unrest; contained expressions of support for law enforcement; or denigrated the legitimacy of the movement.
 
-We employed a topic classification algorithm using gradient-boosted trees and 5-fold cross validation. Gradient-boosted trees are a boosted sum of trees model that are able to integrate gradient descent to improve accuracy. We used the methods outline in @topic, with binary classifications (pro-BLM vs not, BLM vs not). Topic classification, otherwise known as text classification, is a supervised text mining method and a sub-field of natural language processing (NLP) machine learning. As a supervised The model was trained on a sample of approximately 3,500 hand-labeled tweets. Each instance could be a) on topic, b) pro-BLM/pro-reform/anti-police, and/or c) pro-police/anti-BLM. Most tweets could be categorized into either of the latter two groups.
+We employed a topic classification algorithm using gradient-boosted trees and 5-fold cross validation. Gradient-boosted trees are a boosted sum of trees model that are able to integrate gradient descent to improve accuracy. We used the methods outline in @topic, with binary classifications (pro-BLM vs not, BLM vs not). Topic classification, otherwise known as text classification, is a supervised text mining method and a sub-field of natural language processing (NLP) machine learning. The model was trained on a sample of approximately 3,500 hand-labeled tweets. Each instance could be a) on topic, b) pro-BLM/pro-reform/anti-police, and/or c) pro-police/anti-BLM. Most tweets could be categorized into either of the latter two groups.
 
 @(Jay Inslee): “Together, we grieve for the death of George Floyd, and many, many others. The events in Minnesota and across the nation the past few nights have been stunning and illustrate how inequity causes people to lose faith in their public institutions.”
 
 @(Bill Lee): “Approaches that would result in the total upheaval of police are not the right approach to these real and challenging issues. We support law enforcement in Tennessee, and I have the utmost respect for these men and women who serve their communities every day.”
 
-Some politicians expressed sentiments from both groups at the same time. \
-\(\hspace{.5cm}\) \@NC_Governor (Roy Cooper): “It’s critical that our state law enforcement be leaders in repairing this breach. They have a tough job and I’m grateful for so many of them who are doing their best to protect and serve with fairness. Many are now acknowledging that systemic and cultural changes must be made.”
+Some politicians expressed sentiments from both groups at the same time. 
+
+@NC_Governor (Roy Cooper): “It’s critical that our state law enforcement be leaders in repairing this breach. They have a tough job and I’m grateful for so many of them who are doing their best to protect and serve with fairness. Many are now acknowledging that systemic and cultural changes must be made.”
 
 Due to the sometimes ambiguous nature and expression of political ideologies, these categories do not fully encompass all that is put forth in a politician’s social media content. A tweet advocating for policing transparency may also encourage additional support for the law enforcement branch making those changes in the same breath. Would such a tweet be aligned with the movement calls for reform, or against the demands for defunding? Such contradictions fall within the mixed goals of a grassroots-organized movement. We ran a binary classification algorithm on each of the three topic groups to annotate tweets with none, one, or multiple labels. 
 
@@ -141,11 +142,11 @@ full_lab_tweets |>
 
 # Results
 
-```{r, echo = FALSE, fig.cap = "Police refrom laws passed by state"}
+```{r, echo = FALSE, fig.cap = "Police reform laws passed by state"}
 library(usmap)
-plot_usmap(data = state_info, values = "bill_score", color = "red") + 
+plot_usmap(data = state_info, values = "bill_score", color = "green") + 
   scale_fill_continuous(
-    low = "white", high = "red", name = "Police Reform Laws passed", label = scales::comma
+    low = "white", high = "green", name = "Police Reform Laws passed", label = scales::comma
   ) + theme(legend.position = "right")
 ```
 
@@ -233,7 +234,7 @@ tibble(Variable = c("Intercept", "pro-BLM", "Urban", "White", "Black", "Income",
 
 # Discussion
 
-Interestingly, once we stop treating our data as a network object, more significant relationships emerge. BLM and pro-BLM become significant at the 10% level only when filtering for states who passed at least one police reform law. Is this because the states we excluded passed police reform legislation outside the specified window or were those excluded states contributing valuable and accurate information to our model?
+Interestingly, once we stop treating our data as a network object, more significant relationships emerged. BLM and pro-BLM become significant at the 10% level only when filtering for states who passed at least one police reform law. Is this because the states we excluded passed police reform legislation outside the specified window or were those excluded states contributing valuable and accurate information to our model?
 
 Our network regression models both explain ~5% of the variation in shared police reform laws when accounting for difference in proportion of BLM and pro-BLM tweets and relevant control variables.
 This is 35% and 32% for monadic regression models with BLM and pro-BLM, respectively.
