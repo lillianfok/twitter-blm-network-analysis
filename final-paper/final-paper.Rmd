@@ -141,7 +141,16 @@ full_lab_tweets |>
 
 # Results
 
-The top five states that adopted the most police reform laws from May 25, 2020-May 21, 2021 were Illinois, Washington, Colorado, Massachusetts, and Virginia.
+```{r, echo = FALSE, fig.cap = "Police refrom laws passed by state"}
+library(usmap)
+plot_usmap(data = state_info, values = "bill_score", color = "red") + 
+  scale_fill_continuous(
+    low = "white", high = "red", name = "Police Reform Laws passed", label = scales::comma
+  ) + theme(legend.position = "right")
+```
+
+
+As seen in Figure 2, top five states that adopted the most police reform laws from May 25, 2020-May 21, 2021 were Illinois, Washington, Colorado, Massachusetts, and Virginia.
 
 ```{r, echo = FALSE}
 # BLM vs gender and party
